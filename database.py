@@ -252,8 +252,8 @@ def RFIDReader(connection):
         while True:
             id, text = reader.read()
             timeScan = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            query = "INSERT INTO Attendance VALUES ('{}', '{}');"
-            query = query.format(id, timeScan)
+            query = "INSERT INTO Usernames VALUES ('{}');"
+            query = query.format(id)
             execute_query(connection, query)
             time.sleep(5)
             GPIO.cleanup()
@@ -261,7 +261,7 @@ def RFIDReader(connection):
         print(e)
 
 if __name__ == '__main__':
-    connection = create_db_connection("localhost", "root", "ece482", "Attendance_DB")
+    connection = create_db_connection("44.200.118.80", "ece482", "ece482db", "EC2Test")
     #delete_tables(connection)
     #create_tables(connection)
 
