@@ -1,6 +1,7 @@
 import mysql.connector
 from mysql.connector import Error
 import datetime
+from datetime import datetime
 
 def create_db_connection(host_name, user_name, user_password, db_name):
     connection = None
@@ -243,17 +244,6 @@ def delete_attendances_tables(connection):
             currentDay = CalculateNextDay(currentDay)
 
 if __name__ == '__main__':
-    connection = create_db_connection("localhost", "root", "ece482", "Attendance_DB")
-    #delete_tables(connection)
-    #create_tables(connection)
-
-    query = "INSERT INTO Classes VALUES ('ECE482', 'J', '2023-01-17', '2023-05-13', 'MondayWednesdayFriday', '12:00:00', '13:15:00', 'NigelCrib', 'Nigel', 'inperson');"
-    #execute_query(connection, query)
-    query = """
-    SELECT *
-    FROM Classes;
-    """
-    #read = read_query(connection, query)
-    #print(read)
-
+    connection = create_db_connection("44.200.118.80", "ece482", "ece482db", "EC2Test")
+    create_tables(connection)
     create_attendances_tables(connection)
