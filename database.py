@@ -2,9 +2,6 @@ import mysql.connector
 from mysql.connector import Error
 import datetime
 from datetime import datetime
-from mfrc522 import SimpleMFRC522
-import time
-import RPi.GPIO as GPIO
 
 def create_db_connection(host_name, user_name, user_password, db_name):
     connection = None
@@ -246,32 +243,7 @@ def delete_attendances_tables(connection):
                 break
             currentDay = CalculateNextDay(currentDay)
 
-def RFIDReader(connection):
-    reader = SimpleMFRC522()
-    try:
-        while True:
-            id, text = reader.read()
-            timeScan = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            query = "INSERT INTO Usernames VALUES ('{}');"
-            query = query.format(id)
-            execute_query(connection, query)
-            time.sleep(5)
-            GPIO.cleanup()
-    except Exception as e:
-        print(e)
-
 if __name__ == '__main__':
     connection = create_db_connection("44.200.118.80", "ece482", "ece482db", "EC2Test")
-    #delete_tables(connection)
-    #create_tables(connection)
-
-    query = "INSERT INTO Classes VALUES ('ECE482', 'J', '2023-01-17', '2023-05-13', 'MondayWednesdayFriday', '12:00:00', '13:15:00', 'NigelCrib', 'Nigel', 'inperson');"
-    #execute_query(connection, query)
-    query = """
-    SELECT *
-    FROM Classes;
-    """
-    #read = read_query(connection, query)
-    #print(read)
-
-    RFIDReader(connection)
+    create_tables(connection)
+    create_attendances_tables(connection)
