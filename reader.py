@@ -40,17 +40,16 @@ def read_query(connection, query):
         print(f"Error: '{err}'")
 
 if __name__ == '__main__':
-	reader = SimpleMFRC522()
-	connection = create_db_connection("44.200.118.80", "ece482", "ece482db", "EC2Test")
-	try:
-		while True:
-			id, text = reader.read()
-			timeScan = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-			print(id)
-			print(text)
-			print(timeScan)
-			time.sleep(5)
-			GPIO.cleanup()
-
-	except Exception as e:
-		print(e)
+    reader = SimpleMFRC522()
+    connection = create_db_connection("44.200.118.80", "ece482", "ece482db", "EC2Test")
+    try:
+        while True:
+            id, text = reader.read()
+            timeScan = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            query = "INSERT INTO TABLE VALUES ('{}','{}','{}');"
+            query = query.format(id, text, timeScan)
+            execute_query(connection, query)
+            time.sleep(5)
+            GPIO.cleanup()
+    except Exception as e:
+        print(e)
