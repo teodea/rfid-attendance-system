@@ -1,20 +1,14 @@
-from flask import Flask, render_template, request, redirect
-import mysql.connector
-from mysql.connector import Error
+from flask import Flask, render_template
 
-def create_db_connection(host_name, user_name, user_password, db_name):
-    connection = None
-    try:
-        connection = mysql.connector.connect(
-            host=host_name,
-            user=user_name,
-            passwd=user_password,
-            database=db_name
-        )
-        print("MyNigel-SQL Database connection successful")
-    except Error as err:
-        print(f"Error: '{err}'")
-    return connection
+app = Flask(__name__)
 
-if __name__ == '__main__':
-    connection = create_db_connection("52.3.222.145", "ece482", "ece482db", "EC2Test")
+@app.route("/")
+def home():
+    return render_template("home.html")
+    
+@app.route("/about")
+def about():
+    return render_template("about.html")
+    
+if __name__ == "__main__":
+    app.run(host='0.0.0.0')
