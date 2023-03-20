@@ -73,10 +73,18 @@ def create_tables(connection):
         FOREIGN KEY(studentId) REFERENCES Students
     );
     """
+    create_Users_table = """
+    CREATE TABLE Users(
+        username VARCHAR(32) NOT NULL, 
+        password VARCHAR(32) NOT NULL, 
+        PRIMARY KEY(username)
+    );
+    """
     execute_query(connection, create_Students_table)
     execute_query(connection, create_Classes_table)
     execute_query(connection, create_RFID_table)
     execute_query(connection, create_Attendance_table)
+    execute_query(connection, create_Users_table)
 
 def delete_tables(connection):
     delete_Students_table = """
@@ -91,10 +99,14 @@ def delete_tables(connection):
     delete_Attendance_table = """
     DROP TABLE Attendance;
     """
+    create_Users_table = """
+    DROP TABLE Users;
+    """
     execute_query(connection, delete_Attendance_table)
     execute_query(connection, delete_RFID_table)
     execute_query(connection, delete_Classes_table)
     execute_query(connection, delete_Students_table)
+    execute_query(connection, delete_Users_table)
 
 def CalculateNextDay(currentDay):
     # currentDay = YYYY-MM-DD
