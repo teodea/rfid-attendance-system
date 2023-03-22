@@ -41,7 +41,7 @@ def read_query(connection, query):
 
 if __name__ == '__main__':
     reader = SimpleMFRC522()
-    connection = create_db_connection("44.200.118.80", "ece482", "ece482db", "EC2Test")
+    connection = create_db_connection("52.3.222.145", "ece482", "ece482db", "EC2Test")
     try:
         while True:
             id, text = reader.read()

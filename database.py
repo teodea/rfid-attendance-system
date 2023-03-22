@@ -256,6 +256,6 @@ def delete_attendances_tables(connection):
             currentDay = CalculateNextDay(currentDay)
 
 if __name__ == '__main__':
-    connection = create_db_connection("44.200.118.80", "ece482", "ece482db", "EC2Test")
+    connection = create_db_connection("52.3.222.145", "ece482", "ece482db", "EC2Test")
     create_tables(connection)
     create_attendances_tables(connection)
