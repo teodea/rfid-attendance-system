@@ -13,7 +13,7 @@ def create_db_connection(host_name, user_name, user_password, db_name):
             passwd=user_password,
             database=db_name
         )
-        print("MyNigel-SQL Database connection successful")
+        print("MySQL Database connection successful")
     except Error as err:
         print(f"Error: '{err}'")
     return connection
