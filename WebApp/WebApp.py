@@ -60,6 +60,10 @@ def login():
             error = 'Invalid Credentials. Please try again.'
     return render_template('login.html', error=error)
 
+@app.route("/calendar")
+def calendar():
+    return render_template("calendar.html")
+
 if __name__ == "__main__":
     connection = create_db_connection("52.3.222.145", "ece482", "ece482db", "EC2Test")
     app.run(host='0.0.0.0')
