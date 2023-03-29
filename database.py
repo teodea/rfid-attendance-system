@@ -41,22 +41,38 @@ def create_tables(connection):
     CREATE TABLE Students (
         studentId VARCHAR(32) NOT NULL,
         name VARCHAR(64) NOT NULL,
-        PRIMARY KEY(studentId, name)
+        PRIMARY KEY(studentId)
+    );
+    """
+    create_Instructors_table = """
+    CREATE TABLE Instructors (
+        instructorId VARCHAR(32) NOT NULL,
+        name VARCHAR(64) NOT NULL,
+        PRIMARY KEY(instructorId)
+    );
+    """
+    create_Semesters_table = """
+    CREATE TABLE Semesters (
+        semesterId VARCHAR(16) NOT NULL,
+        startDay DATE NOT NULL,
+        endDay DATE NOT NULL,
+        PRIMARY KEY(semesterId)
     );
     """
     create_Classes_table = """
     CREATE TABLE Classes (
         courseId VARCHAR(16) NOT NULL,
         sectionId VARCHAR(8) NOT NULL,
-        startCourseDay DATE NOT NULL,
-        endCourseDay DATE NOT NULL,
+        semesterId VARCHAR(16) NOT NULL,
         daysOfTheWeek VARCHAR(128) NOT NULL,
         startTime TIME NOT NULL,
         endTime TIME NOT NULL,
         location VARCHAR(32) NOT NULL,
-        instructor VARCHAR(32) NOT NULL,
+        instructorId VARCHAR(32) NOT NULL,
         instructionMode VARCHAR(16) NOT NULL,
-        PRIMARY KEY(courseId, sectionId)
+        PRIMARY KEY(courseId, sectionId),
+        FOREIGN KEY(semesterId) REFERENCES Semesters(semesterId),
+        FOREIGN KEY(instructorId) REFERENCES Instructors(instructorId)
     );
     """
     create_RFID_table = """
@@ -70,17 +86,21 @@ def create_tables(connection):
     CREATE TABLE Attendance (
         studentID VARCHAR(32) NOT NULL,
         time TIMESTAMP NOT NULL,
-        FOREIGN KEY(studentId) REFERENCES Students
+        FOREIGN KEY(studentId) REFERENCES Students(studentId)
     );
     """
     create_Users_table = """
     CREATE TABLE Users(
         username VARCHAR(32) NOT NULL, 
-        password VARCHAR(32) NOT NULL, 
-        PRIMARY KEY(username)
+        password VARCHAR(32) NOT NULL,
+        instructorId VARCHAR(32) NOT NULL,
+        PRIMARY KEY(username),
+        FOREIGN KEY(instructorId) REFERENCES Instructors(instructorId)
     );
     """
     execute_query(connection, create_Students_table)
+    execute_query(connection, create_Instructors_table)
+    execute_query(connection, create_Semesters_table)
     execute_query(connection, create_Classes_table)
     execute_query(connection, create_RFID_table)
     execute_query(connection, create_Attendance_table)
@@ -99,14 +119,22 @@ def delete_tables(connection):
     delete_Attendance_table = """
     DROP TABLE Attendance;
     """
-    create_Users_table = """
+    delete_Users_table = """
     DROP TABLE Users;
     """
+    delete_Semesters_table = """
+    DROP TABLE Semesters;
+    """
+    delete_Instructors_table = """
+    DROP TABLE Instructors;
+    """
+    execute_query(connection, delete_Users_table)
     execute_query(connection, delete_Attendance_table)
     execute_query(connection, delete_RFID_table)
     execute_query(connection, delete_Classes_table)
+    execute_query(connection, delete_Semesters_table)  
     execute_query(connection, delete_Students_table)
-    execute_query(connection, delete_Users_table)
+    execute_query(connection, delete_Instructors_table)
 
 def CalculateNextDay(currentDay):
     # currentDay = YYYY-MM-DD
@@ -180,37 +208,46 @@ def create_attendances_tables(connection):
     """
     read = read_query(connection, query)
     for x in read:
-        instructionMode = x[9]
+        instructionMode = x[8]
         if instructionMode == "online":
             continue
+        semesterId = x[2]
+        query = """
+        SELECT *
+        FROM Semesters
+        WHERE semesterId = {}
+        """
+        query.format(semesterId)
+        for y in read:
+            startCourseDay = y[1]
+            endCourseDay = y[2]
+        read = read_query(connection, query)
         courseId = x[0]
         sectionId = x[1]
-        startCourseDay = x[2]
         startCourseDay = startCourseDay.strftime('%Y-%m-%d')
-        endCourseDay = x[3]
         endCourseDay = endCourseDay.strftime('%Y-%m-%d')
-        daysOfTheWeek = x[4]
-        lectureNumber = 0
+        daysOfTheWeek = x[3]
         currentDay = startCourseDay
         while(True):
             year = currentDay[0:4]
             month = currentDay[5:7]
             if month[0] == "0":
-                month = month[1]
+                modifiedMonth = month[1]
             day = currentDay[8:10]
             if day[0] == "0":
-                day = day[1]
-            formattedDay = datetime.datetime(int(year), int(month), int(day))
+                modifiedDay = day[1]
+            formattedDay = datetime.datetime(int(year), int(modifiedMonth), int(modifiedDay))
             if formattedDay.strftime("%A") in daysOfTheWeek:
-                lectureNumber = lectureNumber + 1
+                stringDay = "{}-{}-{}"
+                stringDay = stringDay.format(year, month, day)
                 query = """
-                CREATE TABLE Class_{}_{}_Lecture{} (
+                CREATE TABLE Class_{}_{}_Day_{} (
                     studentID VARCHAR(32),
                     checkIn TIMESTAMP,
                     FOREIGN KEY(studentId) REFERENCES Students
                 );
                 """
-                query = query.format(courseId, sectionId, lectureNumber)
+                query = query.format(courseId, sectionId, stringDay)
                 execute_query(connection, query)
             if currentDay == endCourseDay:
                 break
@@ -256,6 +293,6 @@ def delete_attendances_tables(connection):
             currentDay = CalculateNextDay(currentDay)
 
 if __name__ == '__main__':
-    connection = create_db_connection("52.3.222.145", "ece482", "ece482db", "EC2Test")
+    connection = create_db_connection("52.3.222.145", "ece482", "ece482db", "Attendance_DB")
+    delete_tables(connection)
     create_tables(connection)
-    create_attendances_tables(connection)
