@@ -54,8 +54,8 @@ def create_tables(connection):
     create_Semesters_table = """
     CREATE TABLE Semesters (
         semesterId VARCHAR(16) NOT NULL,
-        startDay DATE NOT NULL,
-        endDay DATE NOT NULL,
+        startDay DATE,
+        endDay DATE,
         PRIMARY KEY(semesterId)
     );
     """
@@ -103,7 +103,7 @@ def create_tables(connection):
     execute_query(connection, create_Semesters_table)
     execute_query(connection, create_Classes_table)
     execute_query(connection, create_RFID_table)
-    execute_query(connection, create_Attendance_table)
+    #execute_query(connection, create_Attendance_table)
     execute_query(connection, create_Users_table)
 
 def delete_tables(connection):
@@ -244,7 +244,7 @@ def create_attendances_tables(connection):
                 CREATE TABLE Class_{}_{}_Day_{} (
                     studentID VARCHAR(32),
                     checkIn TIMESTAMP,
-                    FOREIGN KEY(studentId) REFERENCES Students
+                    FOREIGN KEY(studentId) REFERENCES Students(studentId)
                 );
                 """
                 query = query.format(courseId, sectionId, stringDay)
@@ -260,33 +260,42 @@ def delete_attendances_tables(connection):
     """
     read = read_query(connection, query)
     for x in read:
-        instructionMode = x[9]
+        instructionMode = x[8]
         if instructionMode == "online":
             continue
+        semesterId = x[2]
+        query = """
+        SELECT *
+        FROM Semesters
+        WHERE semesterId = {}
+        """
+        query.format(semesterId)
+        for y in read:
+            startCourseDay = y[1]
+            endCourseDay = y[2]
+        read = read_query(connection, query)
         courseId = x[0]
         sectionId = x[1]
-        startCourseDay = x[2]
         startCourseDay = startCourseDay.strftime('%Y-%m-%d')
-        endCourseDay = x[3]
         endCourseDay = endCourseDay.strftime('%Y-%m-%d')
-        daysOfTheWeek = x[4]
-        lectureNumber = 0
+        daysOfTheWeek = x[3]
         currentDay = startCourseDay
         while(True):
             year = currentDay[0:4]
             month = currentDay[5:7]
             if month[0] == "0":
-                month = month[1]
+                modifiedMonth = month[1]
             day = currentDay[8:10]
             if day[0] == "0":
-                day = day[1]
-            formattedDay = datetime.datetime(int(year), int(month), int(day))
+                modifiedDay = day[1]
+            formattedDay = datetime.datetime(int(year), int(modifiedMonth), int(modifiedDay))
             if formattedDay.strftime("%A") in daysOfTheWeek:
-                lectureNumber = lectureNumber + 1
+                stringDay = "{}-{}-{}"
+                stringDay = stringDay.format(year, month, day)
                 query = """
-                DROP TABLE Class_{}_{}_Lecture{};
+                DROP TABLE Class_{}_{}_Day_{};
                 """
-                query = query.format(courseId, sectionId, lectureNumber)
+                query = query.format(courseId, sectionId, stringDay)
                 execute_query(connection, query)
             if currentDay == endCourseDay:
                 break
@@ -294,5 +303,7 @@ def delete_attendances_tables(connection):
 
 if __name__ == '__main__':
     connection = create_db_connection("52.3.222.145", "ece482", "ece482db", "Attendance_DB")
-    delete_tables(connection)
-    create_tables(connection)
+    #delete_tables(connection)
+    #create_tables(connection)
+    delete_attendances_tables(connection)
+    create_attendances_tables(connection)
