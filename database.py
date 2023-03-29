@@ -293,6 +293,8 @@ def delete_attendances_tables(connection):
             currentDay = CalculateNextDay(currentDay)
 
 if __name__ == '__main__':
-    connection = create_db_connection("52.3.222.145", "ece482", "ece482db", "Attendance_DB")
-    delete_tables(connection)
-    create_tables(connection)
+    connection = create_db_connection("3.208.87.91", "ece482", "ece482db", "Attendance_DB")
+    #delete_tables(connection)
+    #create_tables(connection)
+    #create_attendances_tables(connection)
+    #delete_attendances_tables(connection)
