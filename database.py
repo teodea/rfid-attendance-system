@@ -65,8 +65,8 @@ def create_tables(connection):
         sectionId VARCHAR(8) NOT NULL,
         semesterId VARCHAR(16) NOT NULL,
         daysOfTheWeek VARCHAR(128) NOT NULL,
-        startTime TIME NOT NULL,
-        endTime TIME NOT NULL,
+        startTime TIME(0) NOT NULL,
+        endTime TIME(0) NOT NULL,
         location VARCHAR(32) NOT NULL,
         instructorId VARCHAR(32) NOT NULL,
         instructionMode VARCHAR(16) NOT NULL,
@@ -206,8 +206,8 @@ def create_attendances_tables(connection):
     SELECT *
     FROM Classes;
     """
-    read = read_query(connection, query)
-    for x in read:
+    readClasses = read_query(connection, query)
+    for x in readClasses:
         instructionMode = x[8]
         if instructionMode == "online":
             continue
@@ -215,13 +215,13 @@ def create_attendances_tables(connection):
         query = """
         SELECT *
         FROM Semesters
-        WHERE semesterId = {}
+        WHERE semesterId = '{}'
         """
-        query.format(semesterId)
-        for y in read:
+        query = query.format(semesterId)
+        readSemesters = read_query(connection, query)
+        for y in readSemesters:
             startCourseDay = y[1]
             endCourseDay = y[2]
-        read = read_query(connection, query)
         courseId = x[0]
         sectionId = x[1]
         startCourseDay = startCourseDay.strftime('%Y-%m-%d')
@@ -231,18 +231,14 @@ def create_attendances_tables(connection):
         while(True):
             year = currentDay[0:4]
             month = currentDay[5:7]
-            if month[0] == "0":
-                modifiedMonth = month[1]
-            day = currentDay[8:10]
-            if day[0] == "0":
-                modifiedDay = day[1]
-            formattedDay = datetime.datetime(int(year), int(modifiedMonth), int(modifiedDay))
+            day = currentDay[8:10].zfill(2)
+            formattedDay = datetime(int(year), int(month), int(day))
             if formattedDay.strftime("%A") in daysOfTheWeek:
-                stringDay = "{}-{}-{}"
+                stringDay = "{}{}{}"
                 stringDay = stringDay.format(year, month, day)
                 query = """
                 CREATE TABLE Class_{}_{}_Day_{} (
-                    studentID VARCHAR(32),
+                    studentId VARCHAR(32),
                     checkIn TIMESTAMP,
                     FOREIGN KEY(studentId) REFERENCES Students(studentId)
                 );
@@ -258,8 +254,8 @@ def delete_attendances_tables(connection):
     SELECT *
     FROM Classes;
     """
-    read = read_query(connection, query)
-    for x in read:
+    readClasses = read_query(connection, query)
+    for x in readClasses:
         instructionMode = x[8]
         if instructionMode == "online":
             continue
@@ -267,13 +263,13 @@ def delete_attendances_tables(connection):
         query = """
         SELECT *
         FROM Semesters
-        WHERE semesterId = {}
+        WHERE semesterId = '{}'
         """
-        query.format(semesterId)
-        for y in read:
+        query = query.format(semesterId)
+        readSemesters = read_query(connection, query)
+        for y in readSemesters:
             startCourseDay = y[1]
             endCourseDay = y[2]
-        read = read_query(connection, query)
         courseId = x[0]
         sectionId = x[1]
         startCourseDay = startCourseDay.strftime('%Y-%m-%d')
@@ -283,14 +279,10 @@ def delete_attendances_tables(connection):
         while(True):
             year = currentDay[0:4]
             month = currentDay[5:7]
-            if month[0] == "0":
-                modifiedMonth = month[1]
-            day = currentDay[8:10]
-            if day[0] == "0":
-                modifiedDay = day[1]
-            formattedDay = datetime.datetime(int(year), int(modifiedMonth), int(modifiedDay))
+            day = currentDay[8:10].zfill(2)
+            formattedDay = datetime(int(year), int(month), int(day))
             if formattedDay.strftime("%A") in daysOfTheWeek:
-                stringDay = "{}-{}-{}"
+                stringDay = "{}{}{}"
                 stringDay = stringDay.format(year, month, day)
                 query = """
                 DROP TABLE Class_{}_{}_Day_{};
@@ -305,5 +297,5 @@ if __name__ == '__main__':
     connection = create_db_connection("52.3.222.145", "ece482", "ece482db", "Attendance_DB")
     #delete_tables(connection)
     #create_tables(connection)
-    delete_attendances_tables(connection)
-    create_attendances_tables(connection)
+    #delete_attendances_tables(connection)
+    #create_attendances_tables(connection)
