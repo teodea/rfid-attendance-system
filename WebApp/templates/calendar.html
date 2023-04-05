@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+  <title>Interactive Calendar</title>
+</head>
+<body onload="renderCalendar()">
+  <h1>Interactive Calendar</h1>
+  <label for="year">Select a year:</label>
+  <select id="year" onchange="renderCalendar()">
+    <option value="2021">2021</option>
+    <option value="2022">2022</option>
+    <option value="2023">2023</option>
+  </select>
+  <div id="calendar-container"></div>
+</body>
+</html>
