@@ -55,7 +55,7 @@ def login():
         query = query.format(username, password)
         credentials = read_query(connection, query)
         if credentials != []:
-            return redirect(url_for('home'))
+            return redirect(url_for('calendar'))
         else:
             error = 'Invalid Credentials. Please try again.'
     return render_template('login.html', error=error)
@@ -65,5 +65,5 @@ def calendar():
     return render_template("calendar.html")
 
 if __name__ == "__main__":
-    connection = create_db_connection("52.3.222.145", "ece482", "ece482db", "EC2Test")
+    connection = create_db_connection("3.208.87.91", "ece482", "ece482db", "Attendance_DB")
     app.run(host='0.0.0.0')
