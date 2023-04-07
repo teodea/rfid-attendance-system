@@ -1,3 +1,6 @@
 ECE218 R Spring TuesdayThursday 14:00:00 15:15:00 MEA202-A 1111 In-Person
 ECE421 T Spring TuesdayThursday 17:05:00 18:20:00 MM205 1111 In-Person
 ECE537 J Spring MondayWednesday 17:05:00 18:20:00 MCA202-A 1111 In-Person
+ECE315 E1 Fall Monday 12:20:00 13:10:00 DM107 1112 In-Person
+ECE316 E3 Fall Wednesday 12:20:00 13:10:00 DM107 1112 In-Person
+ECE322 G Fall MondayWednesdayFriday 14:30:00 15:20:00 SC105 1112 In-Person
