@@ -18,9 +18,9 @@ try:
     cursor = conn.cursor()
     
     # SQL query to fetch data from the Students table
-    stmt = "INSERT INTO Users (username, password, instructorId) VALUES (%s, %s, %s)"
+    stmt = "INSERT INTO Instructors (instructorId, name) VALUES (%s, %s)"
 
-    with open('user_data.txt', 'r') as file:
+    with open('instructor_data.txt', 'r') as file:
         # Loop through each line in the file
         for line in file:
             # Remove whitespace from the beginning and end of the line
@@ -29,13 +29,13 @@ try:
             # Split the line into instructor ID and name
             values = line.split(' ')
             data = {
-                'username': values[0],
-                'password': ' '.join(values[1:-1]),
-                'instructorId': values[-1]
+                'instructorId': values[0],
+                'name': ' '.join(values[1:])
             }
 
             # Data values to be inserted into the database
-            values = (data['username'], data['password'], data['instructorId'])
+            values = (data['instructorId'], data['name'])
+            
             try:
                 # Executing the query
                 cursor.execute(stmt, values)
@@ -47,6 +47,7 @@ try:
                 print('Data inserted successfully!')    
             except mysql.connector.IntegrityError:
                 print(f"Row already exists in database: {values}")
+     
     
 finally:
     # Closing database connections and cursors

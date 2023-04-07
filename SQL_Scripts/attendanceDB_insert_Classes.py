@@ -18,9 +18,9 @@ try:
     cursor = conn.cursor()
     
     # SQL query to fetch data from the Students table
-    stmt = "INSERT INTO Users (username, password, instructorId) VALUES (%s, %s, %s)"
+    stmt = "INSERT INTO Classes (courseId, sectionId, semesterId, daysOfTheWeek, startTime, endTime, location, instructorId, instructionMode) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
 
-    with open('user_data.txt', 'r') as file:
+    with open('class_data.txt', 'r') as file:
         # Loop through each line in the file
         for line in file:
             # Remove whitespace from the beginning and end of the line
@@ -29,13 +29,19 @@ try:
             # Split the line into instructor ID and name
             values = line.split(' ')
             data = {
-                'username': values[0],
-                'password': ' '.join(values[1:-1]),
-                'instructorId': values[-1]
+                'courseId': values[0],
+                'sectionId': values[1],
+                'semesterId': values[2],
+                'daysOfTheWeek': values[3],
+                'startTime': values[4],
+                'endTime': values[5],
+                'location': values[6],
+                'instructorId': values[7],
+                'instructionMode': values[8]
             }
 
             # Data values to be inserted into the database
-            values = (data['username'], data['password'], data['instructorId'])
+            values = (data['courseId'], data['sectionId'], data['semesterId'], data['daysOfTheWeek'], data['startTime'], data['endTime'], data['location'],data['instructorId'], data['instructionMode'])
             try:
                 # Executing the query
                 cursor.execute(stmt, values)
@@ -47,6 +53,7 @@ try:
                 print('Data inserted successfully!')    
             except mysql.connector.IntegrityError:
                 print(f"Row already exists in database: {values}")
+
     
 finally:
     # Closing database connections and cursors
