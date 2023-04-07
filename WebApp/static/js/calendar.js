@@ -1,7 +1,9 @@
 function renderCalendar() {
     const yearSelect = document.getElementById('year');
+    const semesterSelect = document.getElementById('semester');
     const calendarContainer = document.getElementById('calendar-container');
     const selectedYear = parseInt(yearSelect.value);
+    const selectedSemester = semesterSelect.value;
     calendarContainer.innerHTML = '';
     const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
     const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];

@@ -7,6 +7,10 @@ h1 {
 color: #005030;
 }
 
+select {
+    margin-bottom: 5px; 
+}  
+
 label, #year {
 color: #005030;
 }
@@ -16,6 +20,7 @@ display: flex;
 flex-wrap: wrap;
 justify-content: center;
 gap: 10px;
+margin-top: 20px;
 }
 
 .calendar {

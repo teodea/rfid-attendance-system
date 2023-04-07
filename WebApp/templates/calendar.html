@@ -8,12 +8,23 @@
 </head>
 <body onload="renderCalendar()">
   <h1>Interactive Calendar</h1>
+  <div>
   <label for="year">Select a year:</label>
   <select id="year" onchange="renderCalendar()">
     <option value="2021">2021</option>
     <option value="2022">2022</option>
     <option value="2023">2023</option>
   </select>
+  </div>
+  <div>
+  <label for="semester">Select a semester:</label>
+  <select id="semester" onchange="renderCalendar()">
+    <option value="Fall">Fall</option>
+    <option value="Winter">Winter</option>
+    <option value="Spring">Spring</option>
+    <option value="Summer">Summer</option>
+  </select>
+  </div>
   <div id="calendar-container"></div>
 </body>
 </html>
