@@ -38,6 +38,23 @@ body {
   z-index: -1;
   -webkit-animation: sliderShape 15s linear infinite;
 }
+
+.slider-thumb2::before {
+  position: absolute;
+  content: "";
+  left: 28%;
+  top: 20%;
+  width: 540px;
+  height: 540px;
+  background: #ADABC7;
+  border-radius: 22% 47% 42% 85% / 65% 5% 10% 86%;
+  will-change: border-radius, transform, opacity;
+  animation: sliderShape 20s linear infinite;
+  display: block;
+  z-index: -1;
+  -webkit-animation: sliderShape 20s linear infinite;
+}
+
 @keyframes sliderShape{
   0%,100%{
   border-radius: 42% 58% 70% 30% / 45% 45% 55% 55%;
