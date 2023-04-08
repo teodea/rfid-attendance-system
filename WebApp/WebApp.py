@@ -65,13 +65,13 @@ def login():
                 endDay = x[2]
                 if (now > startDay) and (now < endDay):
                     s = x[0]
-                    ay = x[3]                     
+                    ay = x[3]     
                     break
             query = "SELECT DISTINCT academicYear FROM Semesters;"
             academicYearList = [read[0] for read in read_query(connection, query)]
             query = "SELECT semesterId FROM Semesters WHERE academicYear='{}';".format(ay)
             semesterList = [read[0] for read in read_query(connection, query)]
-            return render_template('calendar.html', academicYearList=academicYearList, semesterList=semesterList, defaultAcademicYear=ay, defaultSemester=s)
+            return render_template('calendar.html', academicYearList=academicYearList, semesterList=semesterList, ay=ay, s=s)
         else:
             error = 'Invalid Credentials. Please try again.'
     return render_template('login.html', error=error)

@@ -12,8 +12,12 @@
   <div>
   <label for="academic-year">Select an academic year:</label>
   <select id="academic-year" onchange="getSemesterList()">
-    {% for year in academicYearList %}
-      <option value="{{ year }}">{{ year }}</option>
+    {% for academicYear in academicYearList %}
+      {% if academicYear == ay %}
+        <option value="{{ academicYear }}" selected>{{ academicYear }}</option>
+      {% else %}
+        <option value="{{ academicYear }}">{{ academicYear }}</option>
+      {% endif %}
     {% endfor %}
   </select>
   </div> 
@@ -21,7 +25,11 @@
   <label for="semester">Select a semester:</label>
   <select id="semester">
     {% for semester in semesterList %}
-      <option value="{{ semester }}">{{ semester }}</option>
+      {% if semester == s %}
+        <option value="{{ semester }}" selected>{{ semester }}</option>
+      {% else %}
+        <option value="{{ semester }}">{{ semester }}</option>
+      {% endif %}
     {% endfor %}
   </select>
   </div>

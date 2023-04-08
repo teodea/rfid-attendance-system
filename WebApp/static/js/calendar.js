@@ -11,3 +11,7 @@ function getSemesterList() {
     }
   });
 }
+
+function renderCalendar() {
+  
+}
