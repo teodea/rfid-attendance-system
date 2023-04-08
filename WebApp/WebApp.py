@@ -1,6 +1,8 @@
 from flask import Flask, render_template, redirect, url_for, request
+from flask import jsonify
 import mysql.connector
 from mysql.connector import Error
+import datetime
 
 app = Flask(__name__)
 
@@ -55,14 +57,31 @@ def login():
         query = query.format(username, password)
         credentials = read_query(connection, query)
         if credentials != []:
-            return redirect(url_for('calendar'))
+            query = """SELECT * FROM Semesters;"""
+            read = read_query(connection, query)
+            now = datetime.datetime.now().date()
+            for x in read:
+                startDay = x[1]
+                endDay = x[2]
+                if (now > startDay) and (now < endDay):
+                    s = x[0]
+                    ay = x[3]                     
+                    break
+            query = "SELECT DISTINCT academicYear FROM Semesters;"
+            academicYearList = [read[0] for read in read_query(connection, query)]
+            query = "SELECT semesterId FROM Semesters WHERE academicYear='{}';".format(ay)
+            semesterList = [read[0] for read in read_query(connection, query)]
+            return render_template('calendar.html', academicYearList=academicYearList, semesterList=semesterList, defaultAcademicYear=ay, defaultSemester=s)
         else:
             error = 'Invalid Credentials. Please try again.'
     return render_template('login.html', error=error)
 
-@app.route("/calendar")
-def calendar():
-    return render_template("calendar.html")
+@app.route('/get-semester-list')
+def get_semester_list():
+    academicYear = request.args.get('academicYear')
+    query = "SELECT semesterId FROM Semesters WHERE academicYear='{}';".format(academicYear)
+    semesterList = [read[0] for read in read_query(connection, query)]
+    return jsonify(semesterList)
 
 if __name__ == "__main__":
     connection = create_db_connection("3.208.87.91", "ece482", "ece482db", "Attendance_DB")

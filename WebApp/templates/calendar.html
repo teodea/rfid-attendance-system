@@ -4,25 +4,25 @@
   <meta charset="UTF-8">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/calendar.css') }}">
   <script src="{{ url_for('static', filename='js/calendar.js') }}"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <title>Interactive Calendar</title>
 </head>
-<body onload="renderCalendar()">
+<body> <!--onload="renderCalendar();"-->
   <h1>Interactive Calendar</h1>
   <div>
-  <label for="year">Select a year:</label>
-  <select id="year" onchange="renderCalendar()">
-    <option value="2021">2021</option>
-    <option value="2022">2022</option>
-    <option value="2023">2023</option>
+  <label for="academic-year">Select an academic year:</label>
+  <select id="academic-year" onchange="getSemesterList()">
+    {% for year in academicYearList %}
+      <option value="{{ year }}">{{ year }}</option>
+    {% endfor %}
   </select>
-  </div>
+  </div> 
   <div>
   <label for="semester">Select a semester:</label>
-  <select id="semester" onchange="renderCalendar()">
-    <option value="Fall">Fall</option>
-    <option value="Winter">Winter</option>
-    <option value="Spring">Spring</option>
-    <option value="Summer">Summer</option>
+  <select id="semester">
+    {% for semester in semesterList %}
+      <option value="{{ semester }}">{{ semester }}</option>
+    {% endfor %}
   </select>
   </div>
   <div id="calendar-container"></div>

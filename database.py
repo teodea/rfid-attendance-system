@@ -54,9 +54,10 @@ def create_tables(connection):
     create_Semesters_table = """
     CREATE TABLE Semesters (
         semesterId VARCHAR(16) NOT NULL,
-        startDay DATE,
-        endDay DATE,
-        PRIMARY KEY(semesterId)
+        startDay DATE NOT NULL,
+        endDay DATE NOT NULL,
+        academicYear VARCHAR(16) NOT NULL,
+        PRIMARY KEY(semesterId, academicYear)
     );
     """
     create_Classes_table = """
