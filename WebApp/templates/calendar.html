@@ -7,11 +7,11 @@
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <title>Interactive Calendar</title>
 </head>
-<body> <!--onload="renderCalendar();"-->
+<body onload="renderCalendar()">
   <h1>Interactive Calendar</h1>
   <div>
   <label for="academic-year">Select an academic year:</label>
-  <select id="academic-year" onchange="getSemesterList()">
+  <select id="academic-year" onchange="getSemesterList();renderCalendar();">
     {% for academicYear in academicYearList %}
       {% if academicYear == ay %}
         <option value="{{ academicYear }}" selected>{{ academicYear }}</option>
@@ -23,7 +23,7 @@
   </div> 
   <div>
   <label for="semester">Select a semester:</label>
-  <select id="semester">
+  <select id="semester" onchange="renderCalendar();">
     {% for semester in semesterList %}
       {% if semester == s %}
         <option value="{{ semester }}" selected>{{ semester }}</option>
