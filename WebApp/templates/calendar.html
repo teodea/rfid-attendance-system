@@ -8,10 +8,12 @@
   <title>Interactive Calendar</title>
 </head>
 <body onload="renderCalendar()">
+  <input type="hidden" id="start-day" value="{{ sd }}">
+  <input type="hidden" id="end-day" value="{{ ed }}">
   <h1>Interactive Calendar</h1>
   <div>
   <label for="academic-year">Select an academic year:</label>
-  <select id="academic-year" onchange="getSemesterList();renderCalendar();">
+  <select id="academic-year" onchange="getSemesterList()">
     {% for academicYear in academicYearList %}
       {% if academicYear == ay %}
         <option value="{{ academicYear }}" selected>{{ academicYear }}</option>
@@ -23,7 +25,7 @@
   </div> 
   <div>
   <label for="semester">Select a semester:</label>
-  <select id="semester" onchange="renderCalendar();">
+  <select id="semester" onchange="getSemesterDates();">
     {% for semester in semesterList %}
       {% if semester == s %}
         <option value="{{ semester }}" selected>{{ semester }}</option>
@@ -34,5 +36,6 @@
   </select>
   </div>
   <div id="calendar-container"></div>
+  </div>
 </body>
 </html>

@@ -61,9 +61,9 @@ def login():
             read = read_query(connection, query)
             now = datetime.datetime.now().date()
             for x in read:
-                startDay = x[1]
-                endDay = x[2]
-                if (now > startDay) and (now < endDay):
+                sd = x[1]
+                ed = x[2]
+                if (now > sd) and (now < ed):
                     s = x[0]
                     ay = x[3]     
                     break
@@ -71,7 +71,7 @@ def login():
             academicYearList = [read[0] for read in read_query(connection, query)]
             query = "SELECT semesterId FROM Semesters WHERE academicYear='{}';".format(ay)
             semesterList = [read[0] for read in read_query(connection, query)]
-            return render_template('calendar.html', academicYearList=academicYearList, semesterList=semesterList, ay=ay, s=s)
+            return render_template('calendar.html', academicYearList=academicYearList, semesterList=semesterList, ay=ay, s=s, sd=sd, ed=ed)
         else:
             error = 'Invalid Credentials. Please try again.'
     return render_template('login.html', error=error)
@@ -82,6 +82,18 @@ def get_semester_list():
     query = "SELECT semesterId FROM Semesters WHERE academicYear='{}';".format(academicYear)
     semesterList = [read[0] for read in read_query(connection, query)]
     return jsonify(semesterList)
+
+@app.route('/get-semester-dates')
+def get_semester_dates():
+    academicYear = request.args.get('academicYear')
+    semester = request.args.get('semester')
+    query = "SELECT DATE_FORMAT(startDay, '%Y-%m-%d'), DATE_FORMAT(endDay, '%Y-%m-%d') FROM Semesters WHERE semesterId='{}' AND academicYear='{}'".format(semester, academicYear)
+    read = read_query(connection, query)
+    for x in read:
+        startDay = x[0]
+        endDay = x[1]
+    data = {'startDay': startDay, 'endDay': endDay}
+    return jsonify(data)
 
 if __name__ == "__main__":
     connection = create_db_connection("3.208.87.91", "ece482", "ece482db", "Attendance_DB")
