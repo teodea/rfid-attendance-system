@@ -40,12 +40,6 @@ function renderCalendar() {
   const startDay = document.getElementById('start-day').value;
   const endDay = document.getElementById('end-day').value;
 
-  console.clear();
-  console.log(academicYear);
-  console.log(semester);
-  console.log(startDay);
-  console.log(endDay);
-
   const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
   const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
@@ -59,7 +53,7 @@ function renderCalendar() {
     const monthTitle = document.createElement('h2');
     monthTitle.textContent = `${months[month]}`;
     monthTitle.onclick = function () {
-      console.log(`Month clicked: ${months[month]} ${selectedAcademicYear}`);
+      console.log(`Month clicked: ${months[month]} ${academicYear}`);
     };
     calendar.appendChild(monthTitle);
 
@@ -78,9 +72,26 @@ function renderCalendar() {
     const calendarGrid = document.createElement('div');
     calendarGrid.className = 'calendar-grid';
 
-    const firstDayOfMonth = new Date(selectedAcademicYear, month, 1).getDay();
-    const daysInMonth = new Date(selectedAcademicYear, month+1, 0).getDate();
+    const firstDayOfMonth = new Date(academicYear.substr(0, 4), month, 1).getDay();
+    const daysInMonth = new Date(academicYear.substr(0, 4), month+1, 0).getDate();
 
-    
+    for (let i = 0; i < firstDayOfMonth; i++) {
+      const emptyDay = document.createElement('div');
+      emptyDay.className = 'calendar-day';
+      calendarGrid.appendChild(emptyDay);
+    }
+
+    for (let day = 1; day <= daysInMonth; day++) {
+      const calendarDay = document.createElement('div');
+      calendarDay.className = 'calendar-day';
+      calendarDay.textContent = day;
+      calendarDay.onclick = function () {
+        console.log(`Day clicked: ${day} ${months[month]} ${academicYear}`);
+      };
+      calendarGrid.appendChild(calendarDay);
+    }
+
+    calendar.appendChild(calendarGrid);
+    calendarContainer.appendChild(calendar);
   }
 }
