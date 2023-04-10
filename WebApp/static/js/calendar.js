@@ -111,7 +111,14 @@ function renderAttendanceDay(day, month, year) {
   attendanceTitle.textContent = `${day} ${month} ${year}:`;
   attendance.appendChild(attendanceTitle);
 
-  
+  console.log(document.getElementById('instructor-id').value);
+
+  /*
+  for (let course = 0; course < courses; course++) {
+    PRINT: CLASS X:
+    PRINT:    studentId    name    checkIn
+  }
+  */
 
   attendanceContainer.appendChild(attendance);
 }
