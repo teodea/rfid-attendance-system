@@ -46,7 +46,7 @@ function renderCalendar() {
   startingMonth = parseInt(startDay.substr(5, 2), 10);
   endingMonth = parseInt(endDay.substr(5, 2), 10);
 
-  for (let month = startingMonth-1; month < endingMonth-1; month++) {
+  for (let month = startingMonth-1; month < endingMonth; month++) {
     const calendar = document.createElement('div');
     calendar.className = 'calendar';
 
