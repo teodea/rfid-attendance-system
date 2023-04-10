@@ -53,7 +53,7 @@ function renderCalendar() {
     const monthTitle = document.createElement('h2');
     monthTitle.textContent = `${months[month]}`;
     monthTitle.onclick = function () {
-      console.log(`Month clicked: ${months[month]} ${academicYear}`);
+      console.log(`Month clicked: ${months[month]} ${academicYear}`); //on click event month title
     };
     calendar.appendChild(monthTitle);
 
@@ -72,8 +72,9 @@ function renderCalendar() {
     const calendarGrid = document.createElement('div');
     calendarGrid.className = 'calendar-grid';
 
-    const firstDayOfMonth = new Date(academicYear.substr(0, 4), month, 1).getDay();
-    const daysInMonth = new Date(academicYear.substr(0, 4), month+1, 0).getDate();
+    const currentYear = academicYear.substr(0, 4);
+    const firstDayOfMonth = new Date(currentYear, month, 1).getDay();
+    const daysInMonth = new Date(currentYear, month+1, 0).getDate();
 
     for (let i = 0; i < firstDayOfMonth; i++) {
       const emptyDay = document.createElement('div');
@@ -86,7 +87,10 @@ function renderCalendar() {
       calendarDay.className = 'calendar-day';
       calendarDay.textContent = day;
       calendarDay.onclick = function () {
-        console.log(`Day clicked: ${day} ${months[month]} ${academicYear}`);
+        console.log(`Day clicked: ${day} ${months[month]} ${currentYear}`); //on click event day
+
+        renderAttendanceDay(day, months[month], currentYear);
+
       };
       calendarGrid.appendChild(calendarDay);
     }
@@ -94,4 +98,20 @@ function renderCalendar() {
     calendar.appendChild(calendarGrid);
     calendarContainer.appendChild(calendar);
   }
+}
+
+function renderAttendanceDay(day, month, year) {
+  const attendanceContainer = document.getElementById('attendance-container');
+  attendanceContainer.innerHTML = '';
+
+  const attendance = document.createElement('div');
+  attendance.className = 'attendance';
+
+  const attendanceTitle = document.createElement('h2');
+  attendanceTitle.textContent = `${day} ${month} ${year}:`;
+  attendance.appendChild(attendanceTitle);
+
+  
+
+  attendanceContainer.appendChild(attendance);
 }
