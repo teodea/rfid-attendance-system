@@ -1,3 +1,38 @@
+async function getClassesDay(day, month, year) {
+  const classListAll = await getClassesAll();
+  const classListDay = [];
+  $.ajax({
+    url: '/get-classes-day?classListAll=' + JSON.stringify(classListAll) + '&year=' + year + '&month=' + month + '&day=' + day,
+    type: 'GET',
+    success: function(response) {
+      $.each(response, function(index, value) {
+        classListDay.push([value.studentId, value.checkIn]);
+      });
+      return classListDay
+    }
+  });
+}
+
+function getClassesAll() {
+  return new Promise((resolve, reject) => {
+    const instructorId = $('#instructor-id').val();
+    const academicYear = $('#academic-year').val();
+    const semesterId = $('#semester').val();
+    let classListAll = [];
+    $.ajax({
+      url: '/get-classes-all?instructorId=' + instructorId + '&academicYear=' + academicYear + '&semesterId=' + semesterId,
+      type: 'GET',
+      success: function(response) {
+        $.each(response, function(index, value) {
+          classListAll.push([value.courseId, value.sectionId]);
+        });
+        resolve(classListAll);
+      }
+    });
+  });
+}
+
+
 function getSemesterDates() {
   const academicYear = $('#academic-year').val();
   const semester = $('#semester').val();
@@ -9,7 +44,7 @@ function getSemesterDates() {
       $('#end-day').val(response.endDay.substr(0, 10));
       renderCalendar();
     }
-  })
+  });
 }
 
 function getSemesterList() {
@@ -30,6 +65,31 @@ function getSemesterList() {
     }
   });
 }
+
+function renderAttendanceDay(day, month, year) {
+  const attendanceContainer = document.getElementById('attendance-container');
+  attendanceContainer.innerHTML = '';
+
+  const attendance = document.createElement('div');
+  attendance.className = 'attendance';
+
+  const attendanceTitle = document.createElement('h2');
+  attendanceTitle.textContent = `${day} ${month} ${year}:`;
+  attendance.appendChild(attendanceTitle);
+
+  
+  const classListDay = getClassesDay(day, month, year);
+
+  /*
+  for (let course = 0; course < courses; course++) {
+    PRINT: CLASS X:
+    PRINT:    studentId    name    checkIn
+  }
+  */
+
+  attendanceContainer.appendChild(attendance);
+}
+
 
 function renderCalendar() {
   const calendarContainer = document.getElementById('calendar-container');
@@ -98,27 +158,4 @@ function renderCalendar() {
     calendar.appendChild(calendarGrid);
     calendarContainer.appendChild(calendar);
   }
-}
-
-function renderAttendanceDay(day, month, year) {
-  const attendanceContainer = document.getElementById('attendance-container');
-  attendanceContainer.innerHTML = '';
-
-  const attendance = document.createElement('div');
-  attendance.className = 'attendance';
-
-  const attendanceTitle = document.createElement('h2');
-  attendanceTitle.textContent = `${day} ${month} ${year}:`;
-  attendance.appendChild(attendanceTitle);
-
-  console.log(document.getElementById('instructor-id').value);
-
-  /*
-  for (let course = 0; course < courses; course++) {
-    PRINT: CLASS X:
-    PRINT:    studentId    name    checkIn
-  }
-  */
-
-  attendanceContainer.appendChild(attendance);
 }

@@ -1,8 +1,8 @@
-from flask import Flask, render_template, redirect, url_for, request
-from flask import jsonify
+from flask import Flask, render_template, request, jsonify
 import mysql.connector
 from mysql.connector import Error
 import datetime
+import json
 
 app = Flask(__name__)
 
@@ -49,12 +49,7 @@ def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        query = """
-        SELECT *
-        FROM Users
-        WHERE username='{}' AND password='{}';
-        """
-        query = query.format(username, password)
+        query = "SELECT * FROM Users WHERE username='{}' AND password='{}';".format(username, password)
         credentials = read_query(connection, query)
         if credentials != []:
             instructorId = credentials[0][2]
@@ -72,7 +67,7 @@ def login():
             academicYearList = [read[0] for read in read_query(connection, query)]
             query = "SELECT semesterId FROM Semesters WHERE academicYear='{}';".format(ay)
             semesterList = [read[0] for read in read_query(connection, query)]
-            return render_template('calendar.html', instructorId=instructorId, academicYearList=academicYearList, semesterList=semesterList, ay=ay, s=s, sd=sd, ed=ed)
+            return render_template('calendar.html', instructor=instructorId, academicYearList=academicYearList, semesterList=semesterList, ay=ay, s=s, sd=sd, ed=ed)
         else:
             error = 'Invalid Credentials. Please try again.'
     return render_template('login.html', error=error)
@@ -95,6 +90,35 @@ def get_semester_dates():
         endDay = x[1]
     data = {'startDay': startDay, 'endDay': endDay}
     return jsonify(data)
+
+@app.route('/get-classes-all')
+def get_classes_all():
+    instructorId = request.args.get('instructorId')
+    academicYear = request.args.get('academicYear')
+    semesterId = request.args.get('semesterId')
+    query = "SELECT courseId, sectionId FROM Classes WHERE semesterId='{}' AND academicYear='{}' AND instructorId='{}';".format(semesterId, academicYear, instructorId)
+    read = read_query(connection, query)
+    classListAll = [{'courseId': x[0], 'sectionId': x[1]} for x in read]
+    return jsonify(classListAll)
+
+@app.route('/get-classes-day')
+def get_classes_day():
+    classListAll = request.args.get('classListAll')
+    classListAll = json.loads(classListAll)
+    day = request.args.get('day')
+    day = day.zfill(2)
+    month = request.args.get('month')
+    month = datetime.datetime.strptime(month, '%B')
+    month = month.strftime('%m')
+    year = request.args.get('year')
+    stringDay = "{}{}{}".format(year, month, day)
+    classListDay = []
+    for x in classListAll:
+        query = """SELECT * FROM Class_{}_{}_Day_{}""".format(x[0], x[1], stringDay)
+        read = read_query(connection, query)
+        if read != None:
+            classListDay.append({'studentId': read[0], 'checkIn': read[1]})
+    return jsonify(classListDay)
 
 if __name__ == "__main__":
     connection = create_db_connection("3.208.87.91", "ece482", "ece482db", "Attendance_DB")

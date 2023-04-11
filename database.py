@@ -65,14 +65,15 @@ def create_tables(connection):
         courseId VARCHAR(16) NOT NULL,
         sectionId VARCHAR(8) NOT NULL,
         semesterId VARCHAR(16) NOT NULL,
+        academicYear VARCHAR(16) NOT NULL,
         daysOfTheWeek VARCHAR(128) NOT NULL,
         startTime TIME(0) NOT NULL,
         endTime TIME(0) NOT NULL,
         location VARCHAR(32) NOT NULL,
         instructorId VARCHAR(32) NOT NULL,
         instructionMode VARCHAR(16) NOT NULL,
-        PRIMARY KEY(courseId, sectionId),
-        FOREIGN KEY(semesterId) REFERENCES Semesters(semesterId),
+        PRIMARY KEY(courseId, sectionId, semesterId, academicYear),
+        FOREIGN KEY(semesterId, academicYear) REFERENCES Semesters(semesterId, academicYear),
         FOREIGN KEY(instructorId) REFERENCES Instructors(instructorId)
     );
     """
@@ -300,3 +301,8 @@ if __name__ == '__main__':
     #create_tables(connection)
     #delete_attendances_tables(connection)
     #create_attendances_tables(connection)
+
+    query = """SELECT * FROM Classes WHERE instructorId=1111;"""
+    read = read_query(connection, query)
+    for x in read:
+        print(x)
