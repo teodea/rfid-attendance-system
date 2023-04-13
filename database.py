@@ -280,18 +280,21 @@ def delete_attendances_tables(connection):
         sectionId = x[1]
         startCourseDay = startCourseDay.strftime('%Y-%m-%d')
         endCourseDay = endCourseDay.strftime('%Y-%m-%d')
+        daysOfTheWeek = x[4]
         currentDay = startCourseDay
         while(True):
             year = currentDay[0:4]
             month = currentDay[5:7]
             day = currentDay[8:10].zfill(2)
-            stringDay = "{}{}{}"
-            stringDay = stringDay.format(year, month, day)
-            query = """
-            DROP TABLE Class_{}_{}_Day_{};
-            """
-            query = query.format(courseId, sectionId, stringDay)
-            execute_query(connection, query)
+            formattedDay = datetime(int(year), int(month), int(day))
+            if formattedDay.strftime("%A") in daysOfTheWeek:
+                stringDay = "{}{}{}"
+                stringDay = stringDay.format(year, month, day)
+                query = """
+                DROP TABLE Class_{}_{}_Day_{};
+                """
+                query = query.format(courseId, sectionId, stringDay)
+                execute_query(connection, query)
             stringDayCheck = "{}-{}-{}".format(year, month, day)
             if stringDayCheck == endCourseDay:
                 break
@@ -337,31 +340,6 @@ if __name__ == '__main__':
     #delete_attendances_tables(connection)
     #create_attendances_tables(connection)
     #fill_attendances_tables(connection)
-
-    query = """
-    DROP TABLE Class_ECE315_E1_Day_20231211;
-    DROP TABLE Class_ECE315_E1_Day_20231218;
-    DROP TABLE Class_ECE315_E1_Day_20231225;
-    DROP TABLE Class_ECE316_E3_Day_20231206;
-    DROP TABLE Class_ECE316_E3_Day_20231213;
-    DROP TABLE Class_ECE316_E3_Day_20231220;
-    DROP TABLE Class_ECE316_E3_Day_20231227;
-    DROP TABLE Class_ECE322_G_Day_20231206;
-    DROP TABLE Class_ECE322_G_Day_20231208;
-    DROP TABLE Class_ECE322_G_Day_20231211;
-    DROP TABLE Class_ECE322_G_Day_20231213;
-    DROP TABLE Class_ECE322_G_Day_20231215;
-    DROP TABLE Class_ECE322_G_Day_20231218;
-    DROP TABLE Class_ECE322_G_Day_20231220;
-    DROP TABLE Class_ECE322_G_Day_20231222;
-    DROP TABLE Class_ECE322_G_Day_20231225;
-    DROP TABLE Class_ECE322_G_Day_20231227;
-    DROP TABLE Class_ECE322_G_Day_20231229;
-    """
-    query_list = query.split(';')
-    query_list = [q.strip() for q in query_list]
-    #for q in query_list:
-    #    execute_query(connection, q)
 
     query = """SHOW TABLES;"""
     read = read_query(connection, query)
