@@ -22,8 +22,8 @@ margin: 0;
 .slider-thumb::before {
   position: absolute;
   content: "";
-  left: 28%;
-  top: 20%;
+  left: calc(50vw - 250px);
+  top: calc(50vh - 250px); 
   width: 500px;
   height: 500px;
   background: #EDEDED;
@@ -38,11 +38,11 @@ margin: 0;
 .slider-thumb2::before {
   position: absolute;
   content: "";
-  left: 28%;
-  top: 20%;
+  left: calc(50vw - 250px);
+  top: calc(50vh - 250px); 
   width: 540px;
   height: 540px;
-  background: #DADADA;
+  background: #D8D6DA;
   border-radius: 22% 47% 42% 85% / 65% 5% 10% 86%;
   will-change: border-radius, transform, opacity;
   animation: sliderShape 20s linear infinite;

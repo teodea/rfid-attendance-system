@@ -1,36 +1,32 @@
-html *
-{
+html * {
   font-family: Candara !important;
 }
 
-body {
-    background: linear-gradient(-45deg, #3D3584, #5F6FD9, #3D28A8, #23d5ab);
-    background-size: 400% 400%;
-    animation: gradient 20s ease infinite;
-    height: 100vh;
-    margin: 0;
+@keyframes zoom {
+0% {
+  background-size: 300% 300%;
+}
+100% {
+  background-size: 500% 500%;
+}
 }
 
-@keyframes gradient {
-    0% {
-        background-position: 0% 50%;
-    }
-    50% {
-        background-position: 100% 50%;
-    }
-    100% {
-        background-position: 0% 50%;
-    }
+body {
+background: linear-gradient(-45deg, #FFFFFF, #005030);
+background-size: 500% 500%;
+animation: zoom 12s linear infinite;
+height: 100vh;
+margin: 0;
 }
 
 .slider-thumb::before {
   position: absolute;
   content: "";
-  left: 28%;
-  top: 20%;
+  left: calc(50vw - 250px);
+  top: calc(50vh - 250px); 
   width: 500px;
   height: 500px;
-  background: #C5C0DE;
+  background: #EDEDED;
   border-radius: 62% 47% 82% 35% / 45% 45% 80% 66%;
   will-change: border-radius, transform, opacity;
   animation: sliderShape 15s linear infinite;
@@ -42,11 +38,11 @@ body {
 .slider-thumb2::before {
   position: absolute;
   content: "";
-  left: 28%;
-  top: 20%;
+  left: calc(50vw - 250px);
+  top: calc(50vh - 250px); 
   width: 540px;
   height: 540px;
-  background: #ADABC7;
+  background: #D8D6DA;
   border-radius: 22% 47% 42% 85% / 65% 5% 10% 86%;
   will-change: border-radius, transform, opacity;
   animation: sliderShape 20s linear infinite;
@@ -54,6 +50,88 @@ body {
   z-index: -1;
   -webkit-animation: sliderShape 20s linear infinite;
 }
+
+@keyframes sliderShape {
+  0%, 100% {
+    border-radius: 42% 58% 70% 30% / 45% 45% 55% 55%;
+    transform: translate3d(0, 0, 0) rotateZ(0.01deg);
+  }
+  34% {
+    border-radius: 70% 30% 46% 54% / 30% 29% 71% 70%;
+    transform: translate3d(0, 5px, 0) rotateZ(0.01deg);
+  }
+  50% {
+    transform: translate3d(0, 0, 0) rotateZ(0.01deg);
+  }
+  67% {
+    border-radius: 100% 60% 60% 100% / 100% 100% 60% 60%;
+    transform: translate3d(0, -3px, 0) rotateZ(0.01deg);
+  }
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+  h1 {
+    color: #005030;
+    text-align: center;
+  }
+  
+  input[type="text"], input[type="password"] {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+  }
+  
+input[type="submit"] {
+  display: block;
+  width: 30%;
+  padding: 10px;
+  font-size: 16px;
+  background-color: #F47321;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+input[type="submit"]:hover {
+  background-color: white;
+  color: #005030;
+}
+  
+  .error {
+    color: red;
+    font-size: 14px;
+    margin-top: 10px;
+  }
+
+.login-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 350px;
+  text-align: center;
+  z-index: 1;
+}
+
 
 @keyframes sliderShape{
   0%,100%{
@@ -72,65 +150,6 @@ body {
     transform: translate3d(0,-3px,0) rotateZ(0.01deg);
   }
 }
- 
-  
-  @keyframes fadeIn {
-    0% {
-      opacity: 0;
-      transform: translateY(-20px);
-    }
-    100% {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-  
-  
-  h1 {
-    color: #9370DB;
-    text-align: center;
-  }
-  
-  input[type="text"], input[type="password"] {
-    display: block;
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 10px;
-    font-size: 16px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    box-sizing: border-box;
-  }
-  
-  input[type="submit"] {
-    display: block;
-    width: 100%;
-    padding: 10px;
-    font-size: 16px;
-    background-color: #9370DB;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.2s;
-  }
-  
-  input[type="submit"]:hover {
-    background-color: #9370DB;
-  }
-  
-  .error {
-    color: red;
-    font-size: 14px;
-    margin-top: 10px;
-  }
 
-.login-container {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 350px;
-  text-align: center;
-  z-index: 1;
-}
+
+
