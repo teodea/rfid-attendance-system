@@ -105,6 +105,9 @@ if __name__ == '__main__':
     except mysql.connector.IntegrityError:
                 print(f"Row already exists in database")
 
-    mydb.close()
+    finally:
+        # Closing database connections and cursors
+        if mydb.is_connected():
+            mydb.close()
 
 
