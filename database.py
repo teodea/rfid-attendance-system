@@ -309,27 +309,19 @@ def fill_attendances_tables(connection):
         sectionId = x[2]
         semesterId = x[3]
         academicYear = x[4]
-        query = """SELECT * FROM Semesters WHERE semesterId='{}' AND academicYear='{}';""".format(semesterId, academicYear)
+        query = """SELECT * FROM Semesters WHERE semesterId = '{}' AND academicYear='{}';""".format(semesterId, academicYear)
         readSemesters = read_query(connection, query)
         for y in readSemesters:
             startCourseDay = y[1]
             endCourseDay = y[2]
+        startCourseDay = startCourseDay.strftime('%Y-%m-%d')
+        endCourseDay = endCourseDay.strftime('%Y-%m-%d')
+        query = """SELECT * FROM Classes WHERE courseId='{}' AND sectionId='{}' AND semesterId='{}' AND academicYear='{}';""".format(courseId, sectionId, semesterId, academicYear)
+        readClasses = read_query(connection, query)
+        for y in readClasses:
+            daysOfTheWeek = x[4]
         currentDay = startCourseDay
-        while(True):
-            year = str(currentDay)[0:4]
-            month = str(currentDay)[5:7]
-            day = str(currentDay)[8:10].zfill(2)
-            formattedDay = datetime(int(year), int(month), int(day))
-            stringDay = "{}{}{}"
-            stringDay = stringDay.format(year, month, day)
-            query = """
-            DROP TABLE Class_{}_{}_Day_{};
-            """
-            query = query.format(courseId, sectionId, stringDay)
-            execute_query(connection, query)
-            if currentDay == endCourseDay:
-                break
-            currentDay = CalculateNextDay(currentDay)
+        #while(True):
 
 if __name__ == '__main__':
     connection = create_db_connection("3.208.87.91", "ece482", "ece482db", "Attendance_DB")
@@ -342,6 +334,10 @@ if __name__ == '__main__':
     #fill_attendances_tables(connection)
 
     query = """SHOW TABLES;"""
-    read = read_query(connection, query)
+    #query = """SELECT * FROM Classes;"""
+    #read = read_query(connection, query)
     #for x in read:
     #    print(x[0])
+
+    query = """INSERT INTO Semesters VALUES ('test4', '2019-11-01', '2020-02-20', '2019-2020');"""
+    #execute_query(connection, query)

@@ -90,6 +90,14 @@ function renderAttendanceDay(day, month, year) {
   attendanceContainer.appendChild(attendance);
 }
 
+function handleDayClick(day, month, year, months) {
+  console.log(`Day clicked: ${day} ${months[month-1]} ${year}`);
+  renderAttendanceDay(day, months[month-1], year);
+}
+
+function handleMonthTitleClick(month, year, months) {
+  console.log(`Month clicked: ${months[month - 1]} ${year}`);
+}
 
 function renderCalendar() {
   const calendarContainer = document.getElementById('calendar-container');
@@ -105,57 +113,58 @@ function renderCalendar() {
 
   startingMonth = parseInt(startDay.substr(5, 2), 10);
   endingMonth = parseInt(endDay.substr(5, 2), 10);
+  startingYear = parseInt(startDay.substr(0, 4), 10);
+  endingYear = parseInt(endDay.substr(0, 4), 10);
 
-  for (let month = startingMonth-1; month < endingMonth; month++) {
-    const calendar = document.createElement('div');
-    calendar.className = 'calendar';
-
-    const monthTitle = document.createElement('h2');
-    monthTitle.textContent = `${months[month]}`;
-    monthTitle.onclick = function () {
-      console.log(`Month clicked: ${months[month]} ${academicYear}`); //on click event month title
-    };
-    calendar.appendChild(monthTitle);
-
-    const daysOfWeekContainer = document.createElement('div');
-    daysOfWeekContainer.className = 'days-of-week';
-
-    daysOfWeek.forEach(day => {
-      const dayOfWeek = document.createElement('div');
-      dayOfWeek.className = 'day-of-week';
-      dayOfWeek.textContent = day;
-      daysOfWeekContainer.appendChild(dayOfWeek);
-    });
-
-    calendar.appendChild(daysOfWeekContainer);
-
-    const calendarGrid = document.createElement('div');
-    calendarGrid.className = 'calendar-grid';
-
-    const currentYear = academicYear.substr(0, 4);
-    const firstDayOfMonth = new Date(currentYear, month, 1).getDay();
-    const daysInMonth = new Date(currentYear, month+1, 0).getDate();
-
-    for (let i = 0; i < firstDayOfMonth; i++) {
-      const emptyDay = document.createElement('div');
-      emptyDay.className = 'calendar-day';
-      calendarGrid.appendChild(emptyDay);
+  for (let month = startingMonth, year = startingYear; year < endingYear || (year == endingYear && month <= endingMonth); month++) {
+    (function(month, year) {
+      const calendar = document.createElement('div');
+      calendar.className = 'calendar';
+  
+      const monthTitle = document.createElement('h2');
+      monthTitle.textContent = `${months[month-1]}`;
+      monthTitle.onclick = () => handleMonthTitleClick(month, year, months);
+      calendar.appendChild(monthTitle);
+  
+      const daysOfWeekContainer = document.createElement('div');
+      daysOfWeekContainer.className = 'days-of-week';
+  
+      daysOfWeek.forEach(day => {
+        const dayOfWeek = document.createElement('div');
+        dayOfWeek.className = 'day-of-week';
+        dayOfWeek.textContent = day;
+        daysOfWeekContainer.appendChild(dayOfWeek);
+      });
+  
+      calendar.appendChild(daysOfWeekContainer);
+  
+      const calendarGrid = document.createElement('div');
+      calendarGrid.className = 'calendar-grid';
+  
+      const firstDayOfMonth = new Date(year, month-1, 1).getDay();
+      const daysInMonth = new Date(year, month, 0).getDate();
+  
+      for (let i = 0; i < firstDayOfMonth; i++) {
+        const emptyDay = document.createElement('div');
+        emptyDay.className = 'calendar-day';
+        calendarGrid.appendChild(emptyDay);
+      }
+  
+      for (let day = 1; day <= daysInMonth; day++) {
+        const calendarDay = document.createElement('div');
+        calendarDay.className = 'calendar-day';
+        calendarDay.textContent = day;
+        calendarDay.onclick = () => handleDayClick(day, month, year, months);
+        calendarGrid.appendChild(calendarDay);
+      }
+  
+      calendar.appendChild(calendarGrid);
+      calendarContainer.appendChild(calendar);
+    })(month, year);
+  
+    if (month == 12 && endingMonth != 12) {
+      year++;
+      month = 0;
     }
-
-    for (let day = 1; day <= daysInMonth; day++) {
-      const calendarDay = document.createElement('div');
-      calendarDay.className = 'calendar-day';
-      calendarDay.textContent = day;
-      calendarDay.onclick = function () {
-        console.log(`Day clicked: ${day} ${months[month]} ${currentYear}`); //on click event day
-
-        renderAttendanceDay(day, months[month], currentYear);
-
-      };
-      calendarGrid.appendChild(calendarDay);
-    }
-
-    calendar.appendChild(calendarGrid);
-    calendarContainer.appendChild(calendar);
-  }
+  }  
 }
