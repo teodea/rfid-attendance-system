@@ -114,11 +114,35 @@ def get_classes_day():
     stringDay = "{}{}{}".format(year, month, day)
     classListDay = []
     for x in classListAll:
-        query = """SELECT * FROM Class_{}_{}_Day_{}""".format(x[0], x[1], stringDay)
+        query = """SELECT 1 FROM information_schema.tables WHERE table_name = 'Class_{}_{}_Day_{}' LIMIT 1;""".format(x[0], x[1], stringDay)
         read = read_query(connection, query)
-        if read != None:
-            classListDay.append({'studentId': read[0], 'checkIn': read[1]})
+        if read != []:
+            classListDay.append({'courseId': x[0], 'sectionId': x[1]})
     return jsonify(classListDay)
+
+@app.route('/get-attendance-day')
+def get_attendance_day():
+    courseId = request.args.get('courseId')
+    sectionId = request.args.get('sectionId')
+    year = request.args.get('year')
+    month = request.args.get('month')
+    day = request.args.get('day')
+    month = datetime.datetime.strptime(month, '%B')
+    month = month.strftime('%m')
+    day = day.zfill(2)
+    stringDay = "{}{}{}".format(year, month, day)
+    studentsAttendance = []
+    query = """SELECT * FROM Class_{}_{}_Day_{}""".format(courseId, sectionId, stringDay)
+    while(True):
+        readAttendance = read_query(connection, query)
+        if readAttendance != None:
+            break
+    for x in readAttendance:
+        query = """SELECT name FROM Students WHERE studentId='{}'""".format(x[0])
+        readName = read_query(connection, query)
+        for y in readName:
+            studentsAttendance.append({'studentName': y[0], 'checkIn': x[1]})
+    return jsonify(studentsAttendance)
 
 if __name__ == "__main__":
     connection = create_db_connection("3.208.87.91", "ece482", "ece482db", "Attendance_DB")

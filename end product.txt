@@ -1,0 +1,11 @@
+stuff to add:
+- add a check for online class
+- changing functions so that each student is added at beginning of semester and only check in time is updated at check in.
+        - create functions that alter attendances tables accordingt to add and drop
+        - add an attendance percentage for class day
+- add all the classes that a professor has in a semester at the top of the calendar
+        - when the classes are clicked, show a table that renders all the lectures of that specific class with the attendance
+        - add attendance percentage for class semester
+- make it all pdf downloadable
+- add a total percentage of attendance in all the classes together
+- graphs and models of attendances

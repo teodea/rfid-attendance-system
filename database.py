@@ -333,11 +333,13 @@ if __name__ == '__main__':
     #create_attendances_tables(connection)
     #fill_attendances_tables(connection)
 
-    query = """SHOW TABLES;"""
+    #query = """SHOW TABLES;"""
     #query = """SELECT * FROM Classes;"""
+    #query = """SELECT * FROM Students;"""
+    query = """SELECT * FROM Class_ECE537_J_Day_20230320;"""
     #read = read_query(connection, query)
     #for x in read:
-    #    print(x[0])
+    #    print(x)
 
-    query = """INSERT INTO Semesters VALUES ('test4', '2019-11-01', '2020-02-20', '2019-2020');"""
+    #query = """INSERT INTO Class_ECE537_J_Day_20230320 VALUES ('347370823236', '2023-03-20 12:00:00'), ('113543642231', '2023-03-20 12:00:05'), ('432197412234', '2023-03-20 12:01:00');"""
     #execute_query(connection, query)

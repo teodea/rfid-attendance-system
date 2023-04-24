@@ -1,18 +1,3 @@
-async function getClassesDay(day, month, year) {
-  const classListAll = await getClassesAll();
-  const classListDay = [];
-  $.ajax({
-    url: '/get-classes-day?classListAll=' + JSON.stringify(classListAll) + '&year=' + year + '&month=' + month + '&day=' + day,
-    type: 'GET',
-    success: function(response) {
-      $.each(response, function(index, value) {
-        classListDay.push([value.studentId, value.checkIn]);
-      });
-      return classListDay
-    }
-  });
-}
-
 function getClassesAll() {
   return new Promise((resolve, reject) => {
     const instructorId = $('#instructor-id').val();
@@ -32,6 +17,22 @@ function getClassesAll() {
   });
 }
 
+async function getClassesDay(day, month, year) {
+  const classListAll = await getClassesAll();
+  return new Promise((resolve, reject) => {
+    $.ajax({
+      url: '/get-classes-day?classListAll=' + JSON.stringify(classListAll) + '&year=' + year + '&month=' + month + '&day=' + day,
+      type: 'GET',
+      success: function(response) {
+        const classListDay = [];
+        $.each(response, function(index, value) {
+          classListDay.push([value.courseId, value.sectionId]);
+        });
+        resolve(classListDay);
+      }
+    });
+  });
+}
 
 function getSemesterDates() {
   const academicYear = $('#academic-year').val();
@@ -66,7 +67,23 @@ function getSemesterList() {
   });
 }
 
-function renderAttendanceDay(day, month, year) {
+function getStudentsAttendance(courseId, sectionId, day, month, year) {
+  return new Promise((resolve, reject) => {
+    $.ajax({
+      url: '/get-attendance-day?courseId=' + courseId + '&sectionId=' + sectionId + '&year=' + year + '&month=' + month + '&day=' + day,
+      type: 'GET',
+      success: function(response) {
+        const studentsAttendance = [];
+        $.each(response, function(index, value) {
+          studentsAttendance.push([value.studentName, value.checkIn]);
+        });
+        resolve(studentsAttendance);
+      }
+    });
+  });
+}
+
+async function renderAttendanceDay(day, month, year) {
   const attendanceContainer = document.getElementById('attendance-container');
   attendanceContainer.innerHTML = '';
 
@@ -77,16 +94,42 @@ function renderAttendanceDay(day, month, year) {
   attendanceTitle.textContent = `${day} ${month} ${year}:`;
   attendance.appendChild(attendanceTitle);
 
+  const classListDay = await getClassesDay(day, month, year);
+
+  const coursesContainer = document.createElement('div');
+  coursesContainer.className = 'courses';
   
-  const classListDay = getClassesDay(day, month, year);
+  classListDay.forEach(async course => {
+    const courseOfDay = document.createElement('div');
+    courseOfDay.className = 'course-of-day';
+    courseOfDayTitle = document.createElement('h4');
+    courseOfDayTitle.textContent = course[0] + ":";
+    courseOfDay.append(courseOfDayTitle);
+    studentsAttendance = await getStudentsAttendance(course[0], course[1], day, month, year);
+    studentsAttendance.forEach(student => {
+      const studentTable = document.createElement('div');
+      studentTable.className = 'table';
+      courseOfDay.append(studentTable);
+      const studentNameColumn = document.createElement('div');
+      studentNameColumn.className = 'column';
+      studentTable.append(studentNameColumn);
+      const checkInColumn = document.createElement('div');
+      checkInColumn.className = 'column';
+      studentTable.append(checkInColumn);
+      const studentRowName = document.createElement('div');
+      studentRowName.className = 'attendance-cell';
+      studentRowName.textContent = student[0];
+      studentNameColumn.append(studentRowName);
+      const studentRowCheckIn = document.createElement('div');
+      studentRowCheckIn.className = 'attendance-cell';
+      studentRowCheckIn.textContent = student[1];
+      checkInColumn.append(studentRowCheckIn);
+    });
+    coursesContainer.appendChild(courseOfDay);
+  });
 
-  /*
-  for (let course = 0; course < courses; course++) {
-    PRINT: CLASS X:
-    PRINT:    studentId    name    checkIn
-  }
-  */
-
+  
+  attendance.appendChild(coursesContainer);
   attendanceContainer.appendChild(attendance);
 }
 
