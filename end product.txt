@@ -1,5 +1,4 @@
 stuff to add:
-- add a check for online class
 - changing functions so that each student is added at beginning of semester and only check in time is updated at check in.
         - create functions that alter attendances tables accordingt to add and drop
         - add an attendance percentage for class day

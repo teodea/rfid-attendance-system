@@ -111,13 +111,22 @@ def get_classes_day():
     month = datetime.datetime.strptime(month, '%B')
     month = month.strftime('%m')
     year = request.args.get('year')
+    academicYear = request.args.get('academicYear')
+    semesterId = request.args.get('semesterId')
     stringDay = "{}{}{}".format(year, month, day)
     classListDay = []
     for x in classListAll:
         query = """SELECT 1 FROM information_schema.tables WHERE table_name = 'Class_{}_{}_Day_{}' LIMIT 1;""".format(x[0], x[1], stringDay)
-        read = read_query(connection, query)
-        if read != []:
-            classListDay.append({'courseId': x[0], 'sectionId': x[1]})
+        readCheck = read_query(connection, query)
+        if readCheck != []:
+            classListDay.append({'courseId': x[0], 'sectionId': x[1], 'online': False})
+        else:
+            query = """SELECT * FROM Classes WHERE courseId='{}' AND sectionId='{}' AND semesterId='{}' AND academicYear='{}';""".format(x[0], x[1], semesterId, academicYear)
+            readMode = read_query(connection, query)
+            for y in readMode:
+                formattedDay = datetime.datetime(int(year), int(month), int(day))
+                if formattedDay.strftime("%A") in y[4]:
+                    if y[9] == 'Online': classListDay.append({'courseId': x[0], 'sectionId': x[1], 'online': True})
     return jsonify(classListDay)
 
 @app.route('/get-attendance-day')

@@ -225,7 +225,7 @@ def create_attendances_tables(connection):
     readClasses = read_query(connection, query)
     for x in readClasses:
         instructionMode = x[9]
-        if instructionMode == "online":
+        if instructionMode == "Online":
             continue
         semesterId = x[2]
         academicYear = x[3]
@@ -267,7 +267,7 @@ def delete_attendances_tables(connection):
     readClasses = read_query(connection, query)
     for x in readClasses:
         instructionMode = x[9]
-        if instructionMode == "online":
+        if instructionMode == "Online":
             continue
         semesterId = x[2]
         academicYear = x[3]
@@ -336,7 +336,7 @@ if __name__ == '__main__':
     #query = """SHOW TABLES;"""
     #query = """SELECT * FROM Classes;"""
     #query = """SELECT * FROM Students;"""
-    query = """SELECT * FROM Class_ECE537_J_Day_20230320;"""
+    #query = """SELECT * FROM Class_ECE537_J_Day_20230320;"""
     #read = read_query(connection, query)
     #for x in read:
     #    print(x)

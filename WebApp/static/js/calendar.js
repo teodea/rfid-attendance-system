@@ -19,14 +19,16 @@ function getClassesAll() {
 
 async function getClassesDay(day, month, year) {
   const classListAll = await getClassesAll();
+  const academicYear = $('#academic-year').val();
+  const semesterId = $('#semester').val();
   return new Promise((resolve, reject) => {
     $.ajax({
-      url: '/get-classes-day?classListAll=' + JSON.stringify(classListAll) + '&year=' + year + '&month=' + month + '&day=' + day,
+      url: '/get-classes-day?classListAll=' + JSON.stringify(classListAll) + '&year=' + year + '&month=' + month + '&day=' + day + '&academicYear=' + academicYear + '&semesterId=' + semesterId,
       type: 'GET',
       success: function(response) {
         const classListDay = [];
         $.each(response, function(index, value) {
-          classListDay.push([value.courseId, value.sectionId]);
+          classListDay.push([value.courseId, value.sectionId, value.online]);
         });
         resolve(classListDay);
       }
@@ -95,6 +97,7 @@ async function renderAttendanceDay(day, month, year) {
   attendance.appendChild(attendanceTitle);
 
   const classListDay = await getClassesDay(day, month, year);
+  console.log(classListDay);
 
   const coursesContainer = document.createElement('div');
   coursesContainer.className = 'courses';
@@ -105,30 +108,36 @@ async function renderAttendanceDay(day, month, year) {
     courseOfDayTitle = document.createElement('h4');
     courseOfDayTitle.textContent = course[0] + ":";
     courseOfDay.append(courseOfDayTitle);
-    studentsAttendance = await getStudentsAttendance(course[0], course[1], day, month, year);
-    studentsAttendance.forEach(student => {
-      const studentTable = document.createElement('div');
-      studentTable.className = 'table';
-      courseOfDay.append(studentTable);
-      const studentNameColumn = document.createElement('div');
-      studentNameColumn.className = 'column';
-      studentTable.append(studentNameColumn);
-      const checkInColumn = document.createElement('div');
-      checkInColumn.className = 'column';
-      studentTable.append(checkInColumn);
-      const studentRowName = document.createElement('div');
-      studentRowName.className = 'attendance-cell';
-      studentRowName.textContent = student[0];
-      studentNameColumn.append(studentRowName);
-      const studentRowCheckIn = document.createElement('div');
-      studentRowCheckIn.className = 'attendance-cell';
-      studentRowCheckIn.textContent = student[1];
-      checkInColumn.append(studentRowCheckIn);
-    });
+    if (course[2] == true) {
+      const remotePrint = document.createElement('div');
+      remotePrint.className = 'remoteMessage';
+      remotePrint.textContent = "Online";
+      courseOfDay.append(remotePrint);
+    } else {
+      studentsAttendance = await getStudentsAttendance(course[0], course[1], day, month, year);
+      studentsAttendance.forEach(student => {
+        const studentTable = document.createElement('div');
+        studentTable.className = 'table';
+        courseOfDay.append(studentTable);
+        const studentNameColumn = document.createElement('div');
+        studentNameColumn.className = 'column';
+        studentTable.append(studentNameColumn);
+        const checkInColumn = document.createElement('div');
+        checkInColumn.className = 'column';
+        studentTable.append(checkInColumn);
+        const studentRowName = document.createElement('div');
+        studentRowName.className = 'attendance-cell';
+        studentRowName.textContent = student[0];
+        studentNameColumn.append(studentRowName);
+        const studentRowCheckIn = document.createElement('div');
+        studentRowCheckIn.className = 'attendance-cell';
+        studentRowCheckIn.textContent = student[1];
+        checkInColumn.append(studentRowCheckIn);
+      });
+    }
     coursesContainer.appendChild(courseOfDay);
   });
 
-  
   attendance.appendChild(coursesContainer);
   attendanceContainer.appendChild(attendance);
 }
