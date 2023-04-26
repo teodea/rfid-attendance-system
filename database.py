@@ -318,10 +318,26 @@ def fill_attendances_tables(connection):
         endCourseDay = endCourseDay.strftime('%Y-%m-%d')
         query = """SELECT * FROM Classes WHERE courseId='{}' AND sectionId='{}' AND semesterId='{}' AND academicYear='{}';""".format(courseId, sectionId, semesterId, academicYear)
         readClasses = read_query(connection, query)
+        check = True
         for y in readClasses:
-            daysOfTheWeek = x[4]
+            daysOfTheWeek = y[4]
+            if y[9] == 'Online': check = False
         currentDay = startCourseDay
-        #while(True):
+        while(check):
+            year = currentDay[0:4]
+            month = currentDay[5:7]
+            day = currentDay[8:10].zfill(2)
+            formattedDay = datetime(int(year), int(month), int(day))
+            if formattedDay.strftime("%A") in daysOfTheWeek:
+                stringDay = "{}{}{}"
+                stringDay = stringDay.format(year, month, day)
+                query = """
+                INSERT INTO Class_{}_{}_Day_{} VALUES ('{}', NULL);""".format(courseId, sectionId, stringDay, studentId)
+                execute_query(connection, query)
+            stringDayCheck = "{}-{}-{}".format(year, month, day)
+            if stringDayCheck == endCourseDay:
+                break
+            currentDay = CalculateNextDay(currentDay)
 
 if __name__ == '__main__':
     connection = create_db_connection("3.208.87.91", "ece482", "ece482db", "Attendance_DB")
@@ -331,7 +347,7 @@ if __name__ == '__main__':
 
     #delete_attendances_tables(connection)
     #create_attendances_tables(connection)
-    #fill_attendances_tables(connection)
+    fill_attendances_tables(connection)
 
     #query = """SHOW TABLES;"""
     #query = """SELECT * FROM Classes;"""
