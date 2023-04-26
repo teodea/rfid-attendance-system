@@ -116,15 +116,15 @@ async function renderAttendanceDay(day, month, year) {
     } else {
       studentsAttendance = await getStudentsAttendance(course[0], course[1], day, month, year);
       studentsAttendance.forEach(student => {
-        const studentTable = document.createElement('div');
-        studentTable.className = 'table';
-        courseOfDay.append(studentTable);
+        const studentRow = document.createElement('div');
+        studentRow.className = 'row';
+        courseOfDay.append(studentRow);
         const studentNameColumn = document.createElement('div');
         studentNameColumn.className = 'column';
-        studentTable.append(studentNameColumn);
+        studentRow.append(studentNameColumn);
         const checkInColumn = document.createElement('div');
         checkInColumn.className = 'column';
-        studentTable.append(checkInColumn);
+        studentRow.append(checkInColumn);
         const studentRowName = document.createElement('div');
         studentRowName.className = 'attendance-cell';
         studentRowName.textContent = student[0];
