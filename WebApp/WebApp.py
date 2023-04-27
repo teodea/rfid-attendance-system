@@ -153,6 +153,33 @@ def get_attendance_day():
             studentsAttendance.append({'studentName': y[0], 'checkIn': x[1]})
     return jsonify(studentsAttendance)
 
+@app.route('/get-percentage-attendance-day')
+def get_percentage_attendance_day():
+    courseId = request.args.get('courseId')
+    sectionId = request.args.get('sectionId')
+    year = request.args.get('year')
+    month = request.args.get('month')
+    day = request.args.get('day')
+    month = datetime.datetime.strptime(month, '%B')
+    month = month.strftime('%m')
+    day = day.zfill(2)
+    stringDay = "{}{}{}".format(year, month, day)
+    query = """SELECT * FROM Class_{}_{}_Day_{}""".format(courseId, sectionId, stringDay)
+    countPresent = 0
+    countTotal = 0
+    readAttendance = read_query(connection, query)
+    for x in readAttendance:
+        countTotal = countTotal + 1
+        if x[1] is not None:
+            countPresent = countPresent + 1
+    if countTotal > 0:
+        percentage = (countPresent / countTotal) * 100
+        percentage = round(percentage)
+    else:
+        percentage = 0
+    return str(percentage)
+
+
 if __name__ == "__main__":
     connection = create_db_connection("3.208.87.91", "ece482", "ece482db", "Attendance_DB")
     app.run(host='0.0.0.0')

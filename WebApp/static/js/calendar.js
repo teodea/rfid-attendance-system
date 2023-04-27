@@ -85,6 +85,18 @@ function getStudentsAttendance(courseId, sectionId, day, month, year) {
   });
 }
 
+function getPercentageAttendanceDay(courseId, sectionId, day, month, year) {
+  return new Promise((resolve, reject) => {
+    $.ajax({
+      url: '/get-percentage-attendance-day?courseId=' + courseId + '&sectionId=' + sectionId + '&year=' + year + '&month=' + month + '&day=' + day,
+      type: 'GET',
+      success: function(response) {
+        resolve(response);
+      }
+    });
+  });
+}
+
 async function renderAttendanceDay(day, month, year) {
   const attendanceContainer = document.getElementById('attendance-container');
   attendanceContainer.innerHTML = '';
@@ -106,7 +118,8 @@ async function renderAttendanceDay(day, month, year) {
     const courseOfDay = document.createElement('div');
     courseOfDay.className = 'course-of-day';
     courseOfDayTitle = document.createElement('h4');
-    courseOfDayTitle.textContent = course[0] + ":";
+    percentageAttendanceDay = await getPercentageAttendanceDay(course[0], course[1], day, month, year);
+    courseOfDayTitle.textContent = course[0] + "(" + percentageAttendanceDay + "%)" + ":";
     courseOfDay.append(courseOfDayTitle);
     if (course[2] == true) {
       const remotePrint = document.createElement('div');

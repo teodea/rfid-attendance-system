@@ -347,7 +347,7 @@ if __name__ == '__main__':
 
     #delete_attendances_tables(connection)
     #create_attendances_tables(connection)
-    fill_attendances_tables(connection)
+    #fill_attendances_tables(connection)
 
     #query = """SHOW TABLES;"""
     #query = """SELECT * FROM Classes;"""
