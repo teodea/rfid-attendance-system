@@ -2,12 +2,61 @@
 <html lang="en" dir="ltr">
   <head>
     <meta charset="utf-8">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/template.css') }}">
-    <title>RFID Scanner</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}">
+    <title>RFID University Attendance System</title>
   </head>
   <body>
-    <h1> Welcome to the RFID Scanner </h1>
-    <p> Start checking on your students! </p>
-    <li><a href="{{ url_for('login') }}">Login</a></li>
+    <div class="slider-thumb2">
+      <div class="slider-thumb">
+        <div class="slider-thumb::before"></div>
+        <div class="login-container">
+          <h1>Welcome to iNeedNames</h1>
+          <p>View your class attendance data today!</p>
+          <div class="button-container">
+            <a href="{{ url_for('login') }}" class="button login-btn">Login</a>
+            <button id="authorInfoBtn" class="btn btn-author-info">Author Information</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div id="authorInfoModal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <h1>Author Information</h1>
+        <div class="author">
+          <h2>Matteo De Angelis</h2>
+          <p>Backend and database implementation. Software Engineering, University of Miami '23</p>
+        </div>
+        <div class="author">
+          <h2>Bruce Lozano</h2>
+          <p>Hardware and database implementation. Software Engineering, University of Miami '23</p>
+        </div>
+        <div class="author">
+          <h2>Bayden Willms</h2>
+          <p>Cloud hosting and frontend implementation. Software Engineering, University of Miami '23</p>
+        </div>
+      </div>
+    </div>
+    
+    <script>
+      var modal = document.getElementById("authorInfoModal");
+      var btn = document.getElementById("authorInfoBtn");
+      var span = document.getElementsByClassName("close")[0];
+
+      btn.onclick = function() {
+        modal.style.display = "block";
+      };
+
+      span.onclick = function() {
+        modal.style.display = "none";
+      };
+
+      window.onclick = function(event) {
+        if (event.target == modal) {
+          modal.style.display = "none";
+        }
+      };
+    </script>
   </body>
 </html>

@@ -6,18 +6,22 @@
     <title>RFID Scanner - Login Page</title>
   </head>
   <body>
-    <div class="banner">Hello, Professor!</div>
+    <div class="typewriter">
     <div class="container">
-      <h1>Login to View your Attendances</h1>
-      <br>
-      <form action="" method="post">
-        <input type="text" placeholder="Username" name="username" value="{{ request.form.username }}">
-        <input type="password" placeholder="Password" name="password" value="{{ request.form.password }}">
-        <input class="btn" type="submit" value="Login">
-      </form>
-      {% if error %}
-        <p class="error"><strong>Error:</strong> {{ error }} </p>
-      {% endif %}
+      <div class="slider-thumb2"></div>
+      <div class="slider-thumb">
+        <div class="login-container">
+          <h1>Login to View your Attendance</h1>
+          <form action="" method="post">
+            <input type="text" placeholder="Username" name="username" value="{{ request.form.username }}">
+            <input type="password" placeholder="Password" name="password" value="{{ request.form.password }}">
+            <input class="btn" type="submit" value="Login">
+          </form>
+          {% if error %}
+            <p class="error"><strong>Error:</strong> {{ error }} </p>
+          {% endif %}
+        </div>
+      </div>
     </div>
   </body>
 </html>
