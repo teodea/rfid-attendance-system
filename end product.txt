@@ -1,4 +1,3 @@
-stuff to add:
 - add all the classes that a professor has in a semester at the top of the calendar
         - when the classes are clicked, show a table that renders all the lectures of that specific class with the attendance
         - add attendance percentage for class semester
