@@ -2,6 +2,7 @@ import mysql.connector
 from mysql.connector import Error
 import datetime
 from datetime import datetime
+import random
 
 def create_db_connection(host_name, user_name, user_password, db_name):
     connection = None
@@ -65,14 +66,15 @@ def create_tables(connection):
         courseId VARCHAR(16) NOT NULL,
         sectionId VARCHAR(8) NOT NULL,
         semesterId VARCHAR(16) NOT NULL,
+        academicYear VARCHAR(16) NOT NULL,
         daysOfTheWeek VARCHAR(128) NOT NULL,
         startTime TIME(0) NOT NULL,
         endTime TIME(0) NOT NULL,
         location VARCHAR(32) NOT NULL,
         instructorId VARCHAR(32) NOT NULL,
         instructionMode VARCHAR(16) NOT NULL,
-        PRIMARY KEY(courseId, sectionId),
-        FOREIGN KEY(semesterId) REFERENCES Semesters(semesterId),
+        PRIMARY KEY(courseId, sectionId, semesterId, academicYear),
+        FOREIGN KEY(semesterId, academicYear) REFERENCES Semesters(semesterId, academicYear),
         FOREIGN KEY(instructorId) REFERENCES Instructors(instructorId)
     );
     """
@@ -99,6 +101,18 @@ def create_tables(connection):
         FOREIGN KEY(instructorId) REFERENCES Instructors(instructorId)
     );
     """
+    create_Enrollment_table = """
+    CREATE TABLE Enrollment(
+        studentId VARCHAR(32) NOT NULL,
+        courseId VARCHAR(16) NOT NULL,
+        sectionId VARCHAR(8) NOT NULL,
+        semesterId VARCHAR(16) NOT NULL,
+        academicYear VARCHAR(16) NOT NULL,
+        FOREIGN KEY(studentId) REFERENCES Students(studentId),
+        FOREIGN KEY(courseId, sectionId, semesterId, academicYear) REFERENCES Classes(courseId, sectionId, semesterId, academicYear)
+    );
+    """
+
     execute_query(connection, create_Students_table)
     execute_query(connection, create_Instructors_table)
     execute_query(connection, create_Semesters_table)
@@ -106,6 +120,7 @@ def create_tables(connection):
     execute_query(connection, create_RFID_table)
     #execute_query(connection, create_Attendance_table)
     execute_query(connection, create_Users_table)
+    execute_query(connection, create_Enrollment_table)
 
 def delete_tables(connection):
     delete_Students_table = """
@@ -129,6 +144,10 @@ def delete_tables(connection):
     delete_Instructors_table = """
     DROP TABLE Instructors;
     """
+    delete_Enrollment_table = """
+    DROP TABLE Enrollment;
+    """
+    execute_query(connection, delete_Enrollment_table)
     execute_query(connection, delete_Users_table)
     execute_query(connection, delete_Attendance_table)
     execute_query(connection, delete_RFID_table)
@@ -139,15 +158,15 @@ def delete_tables(connection):
 
 def CalculateNextDay(currentDay):
     # currentDay = YYYY-MM-DD
-    year = currentDay[0:4]
-    month = currentDay[5:7]
-    day = currentDay[8:10]
+    year = str(currentDay)[0:4]
+    month = str(currentDay)[5:7]
+    day = str(currentDay)[8:10]
     isLeapYear = False
     if (int(year) % 4 == 0):
         isLeapYear = True
     if (month == "12") and (day == "31"):
         currentDay = "{}-01-01"
-        currentDay = currentDay.format(year+1)
+        currentDay = currentDay.format(year+str(1))
         return currentDay
     if (month == "01") and (day == "31"):
         currentDay = "{}-02-01"
@@ -203,22 +222,15 @@ def CalculateNextDay(currentDay):
     return currentDay
 
 def create_attendances_tables(connection):
-    query = """
-    SELECT *
-    FROM Classes;
-    """
+    query = """SELECT * FROM Classes;"""
     readClasses = read_query(connection, query)
     for x in readClasses:
-        instructionMode = x[8]
-        if instructionMode == "online":
+        instructionMode = x[9]
+        if instructionMode == "Online":
             continue
         semesterId = x[2]
-        query = """
-        SELECT *
-        FROM Semesters
-        WHERE semesterId = '{}'
-        """
-        query = query.format(semesterId)
+        academicYear = x[3]
+        query = """SELECT * FROM Semesters WHERE semesterId = '{}' AND academicYear='{}';""".format(semesterId, academicYear)
         readSemesters = read_query(connection, query)
         for y in readSemesters:
             startCourseDay = y[1]
@@ -227,7 +239,7 @@ def create_attendances_tables(connection):
         sectionId = x[1]
         startCourseDay = startCourseDay.strftime('%Y-%m-%d')
         endCourseDay = endCourseDay.strftime('%Y-%m-%d')
-        daysOfTheWeek = x[3]
+        daysOfTheWeek = x[4]
         currentDay = startCourseDay
         while(True):
             year = currentDay[0:4]
@@ -239,34 +251,29 @@ def create_attendances_tables(connection):
                 stringDay = stringDay.format(year, month, day)
                 query = """
                 CREATE TABLE Class_{}_{}_Day_{} (
-                    studentId VARCHAR(32),
+                    studentId VARCHAR(32) NOT NULL,
                     checkIn TIMESTAMP,
+                    PRIMARY KEY(studentId),
                     FOREIGN KEY(studentId) REFERENCES Students(studentId)
                 );
                 """
                 query = query.format(courseId, sectionId, stringDay)
                 execute_query(connection, query)
-            if currentDay == endCourseDay:
+            stringDayCheck = "{}-{}-{}".format(year, month, day)
+            if stringDayCheck == endCourseDay:
                 break
             currentDay = CalculateNextDay(currentDay)
 
 def delete_attendances_tables(connection):
-    query = """
-    SELECT *
-    FROM Classes;
-    """
+    query = """SELECT * FROM Classes;"""
     readClasses = read_query(connection, query)
     for x in readClasses:
-        instructionMode = x[8]
-        if instructionMode == "online":
+        instructionMode = x[9]
+        if instructionMode == "Online":
             continue
         semesterId = x[2]
-        query = """
-        SELECT *
-        FROM Semesters
-        WHERE semesterId = '{}'
-        """
-        query = query.format(semesterId)
+        academicYear = x[3]
+        query = """SELECT * FROM Semesters WHERE semesterId = '{}' AND academicYear='{}';""".format(semesterId, academicYear)
         readSemesters = read_query(connection, query)
         for y in readSemesters:
             startCourseDay = y[1]
@@ -275,7 +282,7 @@ def delete_attendances_tables(connection):
         sectionId = x[1]
         startCourseDay = startCourseDay.strftime('%Y-%m-%d')
         endCourseDay = endCourseDay.strftime('%Y-%m-%d')
-        daysOfTheWeek = x[3]
+        daysOfTheWeek = x[4]
         currentDay = startCourseDay
         while(True):
             year = currentDay[0:4]
@@ -290,13 +297,87 @@ def delete_attendances_tables(connection):
                 """
                 query = query.format(courseId, sectionId, stringDay)
                 execute_query(connection, query)
-            if currentDay == endCourseDay:
+            stringDayCheck = "{}-{}-{}".format(year, month, day)
+            if stringDayCheck == endCourseDay:
                 break
             currentDay = CalculateNextDay(currentDay)
 
+def fill_attendances_tables(connection):
+    query = """SELECT * FROM Enrollment;"""
+    readEnrollment = read_query(connection, query)
+    for x in readEnrollment:
+        studentId = x[0]
+        courseId = x[1]
+        sectionId = x[2]
+        semesterId = x[3]
+        academicYear = x[4]
+        query = """SELECT * FROM Semesters WHERE semesterId = '{}' AND academicYear='{}';""".format(semesterId, academicYear)
+        readSemesters = read_query(connection, query)
+        for y in readSemesters:
+            startCourseDay = y[1]
+            endCourseDay = y[2]
+        startCourseDay = startCourseDay.strftime('%Y-%m-%d')
+        endCourseDay = endCourseDay.strftime('%Y-%m-%d')
+        query = """SELECT * FROM Classes WHERE courseId='{}' AND sectionId='{}' AND semesterId='{}' AND academicYear='{}';""".format(courseId, sectionId, semesterId, academicYear)
+        readClasses = read_query(connection, query)
+        check = True
+        for y in readClasses:
+            daysOfTheWeek = y[4]
+            if y[9] == 'Online': check = False
+        currentDay = startCourseDay
+        while(check):
+            year = currentDay[0:4]
+            month = currentDay[5:7]
+            day = currentDay[8:10].zfill(2)
+            formattedDay = datetime(int(year), int(month), int(day))
+            if formattedDay.strftime("%A") in daysOfTheWeek:
+                stringDay = "{}{}{}"
+                stringDay = stringDay.format(year, month, day)
+                query = """
+                INSERT INTO Class_{}_{}_Day_{} VALUES ('{}', NULL);""".format(courseId, sectionId, stringDay, studentId)
+                execute_query(connection, query)
+            stringDayCheck = "{}-{}-{}".format(year, month, day)
+            if stringDayCheck == endCourseDay:
+                break
+            currentDay = CalculateNextDay(currentDay)
+
+def fill_enrollment_table(connection):
+    students = []
+    query = """SELECT studentId FROM Students;"""
+    readStudents = read_query(connection, query)
+    for x in readStudents:
+        students.append(x[0])
+    classes = []
+    query = """SELECT courseId, sectionId, semesterId, academicYear FROM Classes;"""
+    readClasses = read_query(connection, query)
+    for x in readClasses:
+        classes.append((x[0], x[1], x[2], x[3]))
+    for i in range(len(students)):
+        while(True):
+            randi = random.randrange(len(classes))
+            query = """INSERT INTO Enrollment VALUES ('{}', '{}', '{}', '{}', '{}');""".format(students[i], classes[randi][0], classes[randi][1], classes[randi][2], classes[randi][3])
+            execute_query(connection, query)
+            if random.random() >= 0.6:
+                break
+
 if __name__ == '__main__':
     connection = create_db_connection("3.208.87.91", "ece482", "ece482db", "Attendance_DB")
+
     #delete_tables(connection)
     #create_tables(connection)
+
     #delete_attendances_tables(connection)
     #create_attendances_tables(connection)
+    #fill_enrollment_table(connection)
+    #fill_attendances_tables(connection)
+
+    #query = """SHOW TABLES;"""
+    #query = """SELECT * FROM Classes;"""
+    #query = """SELECT * FROM Students;"""
+    #query = """SELECT * FROM Class_ECE537_J_Day_20230320;"""
+    #read = read_query(connection, query)
+    #for x in read:
+    #    print(x)
+
+    #query = """INSERT INTO Class_ECE537_J_Day_20230320 VALUES ('347370823236', '2023-03-20 12:00:00'), ('113543642231', '2023-03-20 12:00:05'), ('432197412234', '2023-03-20 12:01:00');"""
+    #execute_query(connection, query)

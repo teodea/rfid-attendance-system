@@ -1,38 +1,45 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta charset="UTF-8">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/calendar.css') }}">
-  <script src="{{ url_for('static', filename='js/calendar.js') }}"></script>
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <title>Interactive Calendar</title>
-</head>
-<body onload="renderCalendar()">
-  <h1>Interactive Calendar</h1>
-  <div>
-  <label for="academic-year">Select an academic year:</label>
-  <select id="academic-year" onchange="getSemesterList();renderCalendar();">
-    {% for academicYear in academicYearList %}
-      {% if academicYear == ay %}
-        <option value="{{ academicYear }}" selected>{{ academicYear }}</option>
-      {% else %}
-        <option value="{{ academicYear }}">{{ academicYear }}</option>
-      {% endif %}
-    {% endfor %}
-  </select>
-  </div> 
-  <div>
-  <label for="semester">Select a semester:</label>
-  <select id="semester" onchange="renderCalendar();">
-    {% for semester in semesterList %}
-      {% if semester == s %}
-        <option value="{{ semester }}" selected>{{ semester }}</option>
-      {% else %}
-        <option value="{{ semester }}">{{ semester }}</option>
-      {% endif %}
-    {% endfor %}
-  </select>
-  </div>
-  <div id="calendar-container"></div>
-</body>
+  <head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/calendar.css') }}">
+    <script src="{{ url_for('static', filename='js/calendar.js') }}"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <title>Interactive Calendar</title>
+  </head>
+  <body onload="renderCalendar()">
+    <input type="hidden" id="instructor-id" value="{{ instructor }}">
+    <input type="hidden" id="start-day" value="{{ sd }}">
+    <input type="hidden" id="end-day" value="{{ ed }}">
+    <h1>Interactive Calendar</h1>
+    <div>
+      <label for="academic-year">Select an academic year:</label>
+      <select id="academic-year" onchange="getSemesterList()">
+        {% for academicYear in academicYearList %}
+          {% if academicYear == ay %}
+            <option value="{{ academicYear }}" selected>{{ academicYear }}</option>
+          {% else %}
+            <option value="{{ academicYear }}">{{ academicYear }}</option>
+          {% endif %}
+        {% endfor %}
+      </select>
+    </div> 
+    <div>
+      <label for="semester">Select a semester:</label>
+      <select id="semester" onchange="getSemesterDates();">
+        {% for semester in semesterList %}
+          {% if semester == s %}
+            <option value="{{ semester }}" selected>{{ semester }}</option>
+          {% else %}
+            <option value="{{ semester }}">{{ semester }}</option>
+          {% endif %}
+        {% endfor %}
+      </select>
+    </div>
+      <div id="calendar-container"></div>
+    </div>
+    <div>
+      <div id="attendance-container"></div>
+    </div>
+  </body>
 </html>
