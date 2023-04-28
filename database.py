@@ -361,16 +361,46 @@ def fill_enrollment_table(connection):
                 break
 
 def fill_attendances_tables_fake_data(connection):
-    query = """SELECT startDay FROM Semesters WHERE semesterId='Fall' AND academicYear='2022-2023';"""
-    readSemesters = read_query(connection, query)
-    for x in readSemesters:
-        startCourseDay = x[0]
+    query = """SELECT * FROM Enrollment;"""
+    readEnrollment = read_query(connection, query)
+    for x in readEnrollment:
+        studentId = x[0]
+        courseId = x[1]
+        sectionId = x[2]
+        semesterId = x[3]
+        academicYear = x[4]
+        query = """SELECT MIN(startDay), MAX(endDay) FROM Semesters WHERE academicYear='{}';""".format(academicYear)
+        readSemesters = read_query(connection, query)
+        for y in readSemesters:
+            startCourseDay = y[0]
+            endCourseDay = y[1]
         startCourseDay = startCourseDay.strftime('%Y-%m-%d')
-    endCourseCount = datetime.now().date()
-    endCourseCount = endCourseCount.strftime('%Y-%m-%d')
-    currentCourseDay = startCourseDay
-    print(currentCourseDay)
-    print(endCourseCount)
+        endCourseDay = endCourseDay.strftime('%Y-%m-%d')
+        print(startCourseDay)
+        print(endCourseDay)
+        return
+        query = """SELECT * FROM Classes WHERE courseId='{}' AND sectionId='{}' AND semesterId='{}' AND academicYear='{}';""".format(courseId, sectionId, semesterId, academicYear)
+        readClasses = read_query(connection, query)
+        check = True
+        for y in readClasses:
+            daysOfTheWeek = y[4]
+            if y[9] == 'Online': check = False
+        currentDay = startCourseDay
+        while(check):
+            year = currentDay[0:4]
+            month = currentDay[5:7]
+            day = currentDay[8:10].zfill(2)
+            formattedDay = datetime(int(year), int(month), int(day))
+            if formattedDay.strftime("%A") in daysOfTheWeek:
+                stringDay = "{}{}{}"
+                stringDay = stringDay.format(year, month, day)
+                query = """
+                INSERT INTO Class_{}_{}_Day_{} VALUES ('{}', NULL);""".format(courseId, sectionId, stringDay, studentId)
+                execute_query(connection, query)
+            stringDayCheck = "{}-{}-{}".format(year, month, day)
+            if stringDayCheck == endCourseDay:
+                break
+            currentDay = CalculateNextDay(currentDay)
 
 if __name__ == '__main__':
     connection = create_db_connection("3.208.87.91", "ece482", "ece482db", "Attendance_DB")
