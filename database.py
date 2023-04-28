@@ -2,6 +2,7 @@ import mysql.connector
 from mysql.connector import Error
 import datetime
 from datetime import datetime
+import random
 
 def create_db_connection(host_name, user_name, user_password, db_name):
     connection = None
@@ -252,6 +253,7 @@ def create_attendances_tables(connection):
                 CREATE TABLE Class_{}_{}_Day_{} (
                     studentId VARCHAR(32) NOT NULL,
                     checkIn TIMESTAMP,
+                    PRIMARY KEY(studentId),
                     FOREIGN KEY(studentId) REFERENCES Students(studentId)
                 );
                 """
@@ -339,6 +341,25 @@ def fill_attendances_tables(connection):
                 break
             currentDay = CalculateNextDay(currentDay)
 
+def fill_enrollment_table(connection):
+    students = []
+    query = """SELECT studentId FROM Students;"""
+    readStudents = read_query(connection, query)
+    for x in readStudents:
+        students.append(x[0])
+    classes = []
+    query = """SELECT courseId, sectionId, semesterId, academicYear FROM Classes;"""
+    readClasses = read_query(connection, query)
+    for x in readClasses:
+        classes.append((x[0], x[1], x[2], x[3]))
+    for i in range(len(students)):
+        while(True):
+            randi = random.randrange(len(classes))
+            query = """INSERT INTO Enrollment VALUES ('{}', '{}', '{}', '{}', '{}');""".format(students[i], classes[randi][0], classes[randi][1], classes[randi][2], classes[randi][3])
+            execute_query(connection, query)
+            if random.random() >= 0.6:
+                break
+
 if __name__ == '__main__':
     connection = create_db_connection("3.208.87.91", "ece482", "ece482db", "Attendance_DB")
 
@@ -347,6 +368,7 @@ if __name__ == '__main__':
 
     #delete_attendances_tables(connection)
     #create_attendances_tables(connection)
+    #fill_enrollment_table(connection)
     #fill_attendances_tables(connection)
 
     #query = """SHOW TABLES;"""

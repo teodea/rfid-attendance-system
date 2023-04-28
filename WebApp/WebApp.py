@@ -167,7 +167,10 @@ def get_percentage_attendance_day():
     query = """SELECT * FROM Class_{}_{}_Day_{}""".format(courseId, sectionId, stringDay)
     countPresent = 0
     countTotal = 0
-    readAttendance = read_query(connection, query)
+    while(True):
+        readAttendance = read_query(connection, query)
+        if readAttendance != None:
+            break
     for x in readAttendance:
         countTotal = countTotal + 1
         if x[1] is not None:
@@ -178,7 +181,6 @@ def get_percentage_attendance_day():
     else:
         percentage = 0
     return str(percentage)
-
 
 if __name__ == "__main__":
     connection = create_db_connection("3.208.87.91", "ece482", "ece482db", "Attendance_DB")

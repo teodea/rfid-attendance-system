@@ -97,6 +97,41 @@ function getPercentageAttendanceDay(courseId, sectionId, day, month, year) {
   });
 }
 
+async function createCourseOfDayElement(course, day, month, year) {
+  const courseOfDay = document.createElement('div');
+  courseOfDay.className = 'course-of-day';
+  const courseOfDayTitle = document.createElement('h4');
+  if (course[2] == true) {
+    courseOfDayTitle.textContent = course[0] + " (Online)";
+    courseOfDay.append(courseOfDayTitle);
+  } else {
+    const percentageAttendanceDay = await getPercentageAttendanceDay(course[0], course[1], day, month, year);
+    courseOfDayTitle.textContent = course[0] + " (" + percentageAttendanceDay + "%)" + ":";
+    courseOfDay.append(courseOfDayTitle);
+    const studentsAttendance = await getStudentsAttendance(course[0], course[1], day, month, year);
+    studentsAttendance.forEach(student => {
+      const studentRow = document.createElement('div');
+      studentRow.className = 'row';
+      courseOfDay.append(studentRow);
+      const studentNameColumn = document.createElement('div');
+      studentNameColumn.className = 'column';
+      studentRow.append(studentNameColumn);
+      const checkInColumn = document.createElement('div');
+      checkInColumn.className = 'column';
+      studentRow.append(checkInColumn);
+      const studentRowName = document.createElement('div');
+      studentRowName.className = 'attendance-cell';
+      studentRowName.textContent = student[0];
+      studentNameColumn.append(studentRowName);
+      const studentRowCheckIn = document.createElement('div');
+      studentRowCheckIn.className = 'attendance-cell';
+      studentRowCheckIn.textContent = student[1];
+      checkInColumn.append(studentRowCheckIn);
+    });
+  }
+  return courseOfDay;
+}
+
 async function renderAttendanceDay(day, month, year) {
   const attendanceContainer = document.getElementById('attendance-container');
   attendanceContainer.innerHTML = '';
@@ -115,39 +150,7 @@ async function renderAttendanceDay(day, month, year) {
   coursesContainer.className = 'courses';
   
   classListDay.forEach(async course => {
-    const courseOfDay = document.createElement('div');
-    courseOfDay.className = 'course-of-day';
-    courseOfDayTitle = document.createElement('h4');
-    percentageAttendanceDay = await getPercentageAttendanceDay(course[0], course[1], day, month, year);
-    courseOfDayTitle.textContent = course[0] + "(" + percentageAttendanceDay + "%)" + ":";
-    courseOfDay.append(courseOfDayTitle);
-    if (course[2] == true) {
-      const remotePrint = document.createElement('div');
-      remotePrint.className = 'remoteMessage';
-      remotePrint.textContent = "Online";
-      courseOfDay.append(remotePrint);
-    } else {
-      studentsAttendance = await getStudentsAttendance(course[0], course[1], day, month, year);
-      studentsAttendance.forEach(student => {
-        const studentRow = document.createElement('div');
-        studentRow.className = 'row';
-        courseOfDay.append(studentRow);
-        const studentNameColumn = document.createElement('div');
-        studentNameColumn.className = 'column';
-        studentRow.append(studentNameColumn);
-        const checkInColumn = document.createElement('div');
-        checkInColumn.className = 'column';
-        studentRow.append(checkInColumn);
-        const studentRowName = document.createElement('div');
-        studentRowName.className = 'attendance-cell';
-        studentRowName.textContent = student[0];
-        studentNameColumn.append(studentRowName);
-        const studentRowCheckIn = document.createElement('div');
-        studentRowCheckIn.className = 'attendance-cell';
-        studentRowCheckIn.textContent = student[1];
-        checkInColumn.append(studentRowCheckIn);
-      });
-    }
+    const courseOfDay = await createCourseOfDayElement(course, day, month, year);
     coursesContainer.appendChild(courseOfDay);
   });
 
