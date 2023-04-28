@@ -360,6 +360,18 @@ def fill_enrollment_table(connection):
             if random.random() >= 0.6:
                 break
 
+def fill_attendances_tables_fake_data(connection):
+    query = """SELECT startDay FROM Semesters WHERE semesterId='Fall' AND academicYear='2022-2023';"""
+    readSemesters = read_query(connection, query)
+    for x in readSemesters:
+        startCourseDay = x[0]
+        startCourseDay = startCourseDay.strftime('%Y-%m-%d')
+    endCourseCount = datetime.now().date()
+    endCourseCount = endCourseCount.strftime('%Y-%m-%d')
+    currentCourseDay = startCourseDay
+    print(currentCourseDay)
+    print(endCourseCount)
+
 if __name__ == '__main__':
     connection = create_db_connection("3.208.87.91", "ece482", "ece482db", "Attendance_DB")
 
@@ -370,6 +382,7 @@ if __name__ == '__main__':
     #create_attendances_tables(connection)
     #fill_enrollment_table(connection)
     #fill_attendances_tables(connection)
+    fill_attendances_tables_fake_data(connection)
 
     #query = """SHOW TABLES;"""
     #query = """SELECT * FROM Classes;"""

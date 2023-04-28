@@ -6,4 +6,4 @@
 - graphs and models of attendances
 - structure of days in calendar is not consistent in all months
 - logout button
-- a check when calculating the attendances, that checks for late check in.
+- a check when calculating the attendances, that checks for late check in
