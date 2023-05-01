@@ -184,6 +184,20 @@ def get_percentage_attendance_day():
         percentage = 0
     return str(percentage)
 
+@app.route('/get-course-status')
+def get_course_status():
+    courseId = request.args.get('courseId')
+    sectionId = request.args.get('sectionId')
+    academicYear = request.args.get('academicYear')
+    semesterId = request.args.get('semesterId')
+    query = """SELECT * FROM Classes WHERE courseId='{}' AND sectionId='{}' AND semesterId='{}' AND academicYear='{}';""".format(courseId, sectionId, semesterId, academicYear)
+    readClass = read_query(connection, query)
+    for x in readClass:
+        daysOfTheWeek = x[4]
+        instructionMode = x[9]
+        data = {'daysOfTheWeek': daysOfTheWeek, 'instructionMode': instructionMode}
+        return jsonify(data)
+
 if __name__ == "__main__":
     connection = create_db_connection("3.208.87.91", "ece482", "ece482db", "Attendance_DB")
     app.run(host='0.0.0.0')

@@ -17,6 +17,24 @@ function getClassesAll() {
   });
 }
 
+function getCourseStatus(courseId, sectionId) {
+  return new Promise((resolve, reject) => {
+    const academicYear = $('#academic-year').val();
+    const semesterId = $('#semester').val();
+    $.ajax({
+      url: '/get-course-status?courseId=' + courseId + '&sectionId=' + sectionId + '&academicYear=' + academicYear + '&semesterId=' + semesterId,
+      type: 'GET',
+      success: function(response) {
+        const courseStatus = {
+          daysOfTheWeek: response.daysOfTheWeek,
+          instructionMode: response.instructionMode
+        };
+        resolve(courseStatus);
+      }
+    });
+  });
+}
+
 async function getClassesDay(day, month, year) {
   const classListAll = await getClassesAll();
   const academicYear = $('#academic-year').val();
@@ -158,7 +176,50 @@ async function renderAttendanceDay(day, month, year) {
   attendanceContainer.appendChild(attendance);
 }
 
-function renderCourseSemester(course) {
+function calculateNextDay(currentDay) {
+  // currentDay = YYYY-MM-DD
+  let year = String(currentDay).substring(0, 4);
+  let month = String(currentDay).substring(5, 7);
+  let day = String(currentDay).substring(8, 10);
+  let isLeapYear = false;
+  if (parseInt(year) % 4 === 0) {
+    isLeapYear = true;
+  }
+  if (month === "12" && day === "31") {
+    currentDay = `${parseInt(year) + 1}-01-01`;
+    return currentDay;
+  }
+  const conditions = [
+    {month: "01", day: "31", nextMonth: "02"},
+    {month: "02", day: "28", nextMonth: "03", notLeap: true},
+    {month: "02", day: "29", nextMonth: "03"},
+    {month: "03", day: "31", nextMonth: "04"},
+    {month: "04", day: "30", nextMonth: "05"},
+    {month: "05", day: "31", nextMonth: "06"},
+    {month: "06", day: "30", nextMonth: "07"},
+    {month: "07", day: "31", nextMonth: "08"},
+    {month: "08", day: "31", nextMonth: "09"},
+    {month: "09", day: "30", nextMonth: "10"},
+    {month: "10", day: "31", nextMonth: "11"},
+    {month: "11", day: "30", nextMonth: "12"},
+  ];
+  
+  for (const condition of conditions) {
+    if (month === condition.month && day === condition.day && (!condition.notLeap || !isLeapYear)) {
+      currentDay = `${year}-${condition.nextMonth}-01`;
+      return currentDay;
+    }
+  }
+  
+  day = parseInt(day) + 1;
+  currentDay = `${year}-${month}-${day.toString().padStart(2, '0')}`;
+  return currentDay;
+}
+
+async function renderCourseSemester(course) {
+  const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
   const attendanceContainer = document.getElementById('attendance-container');
   attendanceContainer.innerHTML = '';
 
@@ -169,8 +230,65 @@ function renderCourseSemester(course) {
   attendanceTitle.textContent = `${course[0]}:`;
   attendance.appendChild(attendanceTitle);
 
-  
+  const dayCourseContainer = document.createElement('div');
+  dayCourseContainer.className = 'day-course';
 
+  let currentDay = document.getElementById('start-day').value;
+  const endDay = document.getElementById('end-day').value;
+  while(true) {
+    let year = currentDay.substring(0, 4);
+    let month = currentDay.substring(5, 7);
+    let day = currentDay.substring(8, 10).padStart(2, '0');
+    let monthIndex = parseInt(currentDay.substring(5, 7), 10);
+    let monthName = months[monthIndex - 1];
+
+    const courseStatus = await getCourseStatus(course[0], course[1]);
+
+    const dayOfCourse = document.createElement('div');
+    dayOfCourse.className = 'day-of-course';
+    const dayOfCourseTitle = document.createElement('h4');
+
+    if (courseStatus.instructionMode == 'Online') { 
+      dayOfCourseTitle.textContent = "This is an online class.";
+      dayOfCourse.append(dayOfCourseTitle);
+      dayCourseContainer.appendChild(dayOfCourse);
+      break; 
+    } else {
+      let formattedDay = new Date(year, month - 1, day);
+      let dayOfWeek = daysOfWeek[formattedDay.getDay()];
+      if (courseStatus.daysOfTheWeek.includes(dayOfWeek)) {
+        const percentageAttendanceDay = await getPercentageAttendanceDay(course[0], course[1], day, monthName, year);
+        dayOfCourseTitle.textContent = currentDay + " (" + percentageAttendanceDay + "%)" + ":";
+        dayOfCourse.append(dayOfCourseTitle);
+        const studentsAttendance = await getStudentsAttendance(course[0], course[1], day, monthName, year);
+        studentsAttendance.forEach(student => {
+          const studentRow = document.createElement('div');
+          studentRow.className = 'row';
+          dayOfCourse.append(studentRow);
+          const studentNameColumn = document.createElement('div');
+          studentNameColumn.className = 'column';
+          studentRow.append(studentNameColumn);
+          const checkInColumn = document.createElement('div');
+          checkInColumn.className = 'column';
+          studentRow.append(checkInColumn);
+          const studentRowName = document.createElement('div');
+          studentRowName.className = 'attendance-cell';
+          studentRowName.textContent = student[0];
+          studentNameColumn.append(studentRowName);
+          const studentRowCheckIn = document.createElement('div');
+          studentRowCheckIn.className = 'attendance-cell';
+          studentRowCheckIn.textContent = student[1];
+          checkInColumn.append(studentRowCheckIn);
+        });
+        dayCourseContainer.appendChild(dayOfCourse);
+      }
+    }
+
+    if (currentDay == endDay) { break; }
+    currentDay = calculateNextDay(currentDay);
+  }
+
+  attendance.appendChild(dayCourseContainer);
   attendanceContainer.appendChild(attendance);
 }
 
@@ -202,7 +320,6 @@ async function renderCourses() {
 
   coursesContainer.appendChild(courses);
 }
-
 
 function renderCalendar() {
   renderCourses();

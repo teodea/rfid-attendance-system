@@ -342,7 +342,7 @@ def fill_attendances_tables(connection):
                 break
             currentDay = CalculateNextDay(currentDay)
 
-def fill_enrollment_table(connection):
+def fill_enrollment_table_randomly(connection):
     students = []
     query = """SELECT studentId FROM Students;"""
     readStudents = read_query(connection, query)
@@ -416,7 +416,7 @@ if __name__ == '__main__':
 
     #delete_tables(connection)
     #create_tables(connection)
-    #fill_enrollment_table(connection)
+    #fill_enrollment_table_randomly(connection)
 
     #delete_attendances_tables(connection)
     #create_attendances_tables(connection)
