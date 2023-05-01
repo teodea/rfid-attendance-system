@@ -40,6 +40,72 @@ def read_query(connection, query):
     except Error as err:
         print(f"Error: '{err}'")
 
+def CalculateNextDay(currentDay):
+    # currentDay = YYYY-MM-DD
+    year = str(currentDay)[0:4]
+    month = str(currentDay)[5:7]
+    day = str(currentDay)[8:10]
+    isLeapYear = False
+    if (int(year) % 4 == 0):
+        isLeapYear = True
+    if (month == "12") and (day == "31"):
+        currentDay = "{}-01-01"
+        year = str(int(year)+1)
+        currentDay = currentDay.format(year)
+        return currentDay
+    if (month == "01") and (day == "31"):
+        currentDay = "{}-02-01"
+        currentDay = currentDay.format(year)
+        return currentDay
+    if (month == "02") and (day == "28") and (isLeapYear == False):
+        currentDay = "{}-03-01"
+        currentDay = currentDay.format(year)
+        return currentDay
+    if (month == "02") and (day == "29"):
+        currentDay = "{}-03-01"
+        currentDay = currentDay.format(year)
+        return currentDay
+    if (month == "03") and (day == "31"):
+        currentDay = "{}-04-01"
+        currentDay = currentDay.format(year)
+        return currentDay
+    if (month == "04") and (day == "30"):
+        currentDay = "{}-05-01"
+        currentDay = currentDay.format(year)
+        return currentDay
+    if (month == "05") and (day == "31"):
+        currentDay = "{}-06-01"
+        currentDay = currentDay.format(year)
+        return currentDay
+    if (month == "06") and (day == "30"):
+        currentDay = "{}-07-01"
+        currentDay = currentDay.format(year)
+        return currentDay
+    if (month == "07") and (day == "31"):
+        currentDay = "{}-07-01"
+        currentDay = currentDay.format(year)
+        return currentDay
+    if (month == "08") and (day == "31"):
+        currentDay = "{}-09-01"
+        currentDay = currentDay.format(year)
+        return currentDay
+    if (month == "09") and (day == "30"):
+        currentDay = "{}-10-01"
+        currentDay = currentDay.format(year)
+        return currentDay
+    if (month == "10") and (day == "31"):
+        currentDay = "{}-11-01"
+        currentDay = currentDay.format(year)
+        return currentDay
+    if (month == "11") and (day == "30"):
+        currentDay = "{}-12-01"
+        currentDay = currentDay.format(year)
+        return currentDay
+    day = int(day) + 1
+    currentDay = "{}-{}-{}"
+    currentDay = currentDay.format(year, month, day)
+    return currentDay
+
 @app.route("/")
 def home():
     return render_template("home.html")
@@ -197,6 +263,56 @@ def get_course_status():
         instructionMode = x[9]
         data = {'daysOfTheWeek': daysOfTheWeek, 'instructionMode': instructionMode}
         return jsonify(data)
+
+@app.route('/get-percentage-attendance-course-semester')
+def get_percentage_attendance_course_semester():
+    courseId = request.args.get('courseId')
+    sectionId = request.args.get('sectionId')
+    academicYear = request.args.get('academicYear')
+    semesterId = request.args.get('semesterId')
+    query = """SELECT * FROM Classes WHERE courseId='{}' AND sectionId='{}' AND semesterId='{}' AND academicYear='{}';""".format(courseId, sectionId, semesterId, academicYear)
+    readClass = read_query(connection, query)
+    for x in readClass:
+        instructionMode = x[9]
+        if instructionMode == "Online":
+            return("Online")
+        query = """SELECT * FROM Semesters WHERE semesterId = '{}' AND academicYear='{}';""".format(semesterId, academicYear)
+        readSemesters = read_query(connection, query)
+        for y in readSemesters:
+            startCourseDay = y[1]
+            endCourseDay = y[2]
+        startCourseDay = startCourseDay.strftime('%Y-%m-%d')
+        endCourseDay = endCourseDay.strftime('%Y-%m-%d')
+        daysOfTheWeek = x[4]
+        currentDay = startCourseDay
+        countPresent = 0
+        countTotal = 0
+        while(True):
+            year = currentDay[0:4]
+            month = currentDay[5:7]
+            day = currentDay[8:10].zfill(2)
+            formattedDay = datetime.datetime(int(year), int(month), int(day))
+            if formattedDay.strftime("%A") in daysOfTheWeek:
+                stringDay = "{}{}{}"
+                stringDay = stringDay.format(year, month, day)
+                query = """SELECT * FROM Class_{}_{}_Day_{}""".format(courseId, sectionId, stringDay)
+                while(True):
+                    readAttendance = read_query(connection, query)
+                    if readAttendance != None:
+                        break
+                for y in readAttendance:
+                    countTotal = countTotal + 1
+                    if y[1] is not None:
+                        countPresent = countPresent + 1
+            stringDayCheck = "{}-{}-{}".format(year, month, day)
+            if stringDayCheck == endCourseDay:
+                if countTotal > 0:
+                    percentage = (countPresent / countTotal) * 100
+                    percentage = round(percentage)
+                else:
+                    percentage = 0
+                return str(percentage)
+            currentDay = CalculateNextDay(currentDay)
 
 if __name__ == "__main__":
     connection = create_db_connection("3.208.87.91", "ece482", "ece482db", "Attendance_DB")

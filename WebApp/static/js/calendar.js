@@ -115,6 +115,20 @@ function getPercentageAttendanceDay(courseId, sectionId, day, month, year) {
   });
 }
 
+function getPercentageAttendanceCourseSemester(courseId, sectionId) {
+  return new Promise((resolve, reject) => {
+    const academicYear = $('#academic-year').val();
+    const semesterId = $('#semester').val();
+    $.ajax({
+      url: '/get-percentage-attendance-course-semester?courseId=' + courseId + '&sectionId=' + sectionId + '&academicYear=' + academicYear + '&semesterId=' + semesterId,
+      type: 'GET',
+      success: function(response) {
+        resolve(response);
+      }
+    });
+  });
+}
+
 async function createCourseOfDayElement(course, day, month, year) {
   const courseOfDay = document.createElement('div');
   courseOfDay.className = 'course-of-day';
@@ -227,7 +241,12 @@ async function renderCourseSemester(course) {
   attendance.className = 'attendance';
 
   const attendanceTitle = document.createElement('h2');
-  attendanceTitle.textContent = `${course[0]}:`;
+  const percentageAttendanceCourseSemester = await getPercentageAttendanceCourseSemester(course[0], course[1]);
+  if (percentageAttendanceCourseSemester == "Online") {
+    attendanceTitle.textContent = course[0] + ":";
+  } else {
+    attendanceTitle.textContent = course[0] + " (" + percentageAttendanceCourseSemester + "%)" + ":";
+  }
   attendance.appendChild(attendanceTitle);
 
   const dayCourseContainer = document.createElement('div');
@@ -235,6 +254,13 @@ async function renderCourseSemester(course) {
 
   let currentDay = document.getElementById('start-day').value;
   const endDay = document.getElementById('end-day').value;
+
+  const loadingTitle = document.createElement('h4');
+  loadingTitle.textContent = 'Loading...';
+  dayCourseContainer.appendChild(loadingTitle);
+  attendance.appendChild(dayCourseContainer);
+  attendanceContainer.appendChild(attendance);
+
   while(true) {
     let year = currentDay.substring(0, 4);
     let month = currentDay.substring(5, 7);
@@ -283,10 +309,10 @@ async function renderCourseSemester(course) {
         dayCourseContainer.appendChild(dayOfCourse);
       }
     }
-
     if (currentDay == endDay) { break; }
     currentDay = calculateNextDay(currentDay);
   }
+  dayCourseContainer.removeChild(loadingTitle);
 
   attendance.appendChild(dayCourseContainer);
   attendanceContainer.appendChild(attendance);
