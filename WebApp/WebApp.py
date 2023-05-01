@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, jsonify
 import mysql.connector
 from mysql.connector import Error
 import datetime
+from datetime import timedelta
 import json
 
 app = Flask(__name__)
@@ -56,13 +57,18 @@ def login():
             query = """SELECT * FROM Semesters;"""
             read = read_query(connection, query)
             now = datetime.datetime.now().date()
+            temp = timedelta(days=9999)
             for x in read:
-                sd = x[1]
-                ed = x[2]
-                if (now > sd) and (now < ed):
+                if (now - x[1] > timedelta(days=0)) and (now - x[1] < temp):
                     s = x[0]
-                    ay = x[3]     
-                    break
+                    sd = x[1]
+                    ed = x[2]
+                    ay = x[3]
+                    temp = now - sd
+            print(s)
+            print(sd)
+            print(ed)
+            print(ay)
             query = "SELECT DISTINCT academicYear FROM Semesters;"
             academicYearList = [read[0] for read in read_query(connection, query)]
             query = "SELECT semesterId FROM Semesters WHERE academicYear='{}';".format(ay)
