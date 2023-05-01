@@ -146,15 +146,31 @@ async function renderAttendanceDay(day, month, year) {
   const classListDay = await getClassesDay(day, month, year);
   console.log(classListDay);
 
-  const coursesContainer = document.createElement('div');
-  coursesContainer.className = 'courses';
+  const coursesDayContainer = document.createElement('div');
+  coursesDayContainer.className = 'courses-day';
   
   classListDay.forEach(async course => {
     const courseOfDay = await createCourseOfDayElement(course, day, month, year);
-    coursesContainer.appendChild(courseOfDay);
+    coursesDayContainer.appendChild(courseOfDay);
   });
 
-  attendance.appendChild(coursesContainer);
+  attendance.appendChild(coursesDayContainer);
+  attendanceContainer.appendChild(attendance);
+}
+
+function renderCourseSemester(course) {
+  const attendanceContainer = document.getElementById('attendance-container');
+  attendanceContainer.innerHTML = '';
+
+  const attendance = document.createElement('div');
+  attendance.className = 'attendance';
+
+  const attendanceTitle = document.createElement('h2');
+  attendanceTitle.textContent = `${course[0]}:`;
+  attendance.appendChild(attendanceTitle);
+
+  
+
   attendanceContainer.appendChild(attendance);
 }
 
@@ -163,16 +179,37 @@ function handleDayClick(day, month, year, months) {
   renderAttendanceDay(day, months[month-1], year);
 }
 
-function handleMonthTitleClick(month, year, months) {
-  console.log(`Month clicked: ${months[month - 1]} ${year}`);
+function handleCourseClick(course) {
+  console.log(`Course clicked: ${course[0]}`);
+  renderCourseSemester(course);
 }
 
+async function renderCourses() {
+  const coursesContainer = document.getElementById('courses-container');
+  coursesContainer.innerHTML = '';
+
+  const courses = document.createElement('div');
+  courses.className = 'courses';
+
+  const classListAll = await getClassesAll();
+  classListAll.forEach(course => {
+    const button = document.createElement('button');
+    button.innerHTML = course[0];
+    button.className = 'course-button';
+    button.onclick = () => handleCourseClick(course);
+    courses.appendChild(button);
+  });
+
+  coursesContainer.appendChild(courses);
+}
+
+
 function renderCalendar() {
+  renderCourses();
+
   const calendarContainer = document.getElementById('calendar-container');
   calendarContainer.innerHTML = '';
   
-  const academicYear = document.getElementById('academic-year').value;
-  const semester = document.getElementById('semester').value;
   const startDay = document.getElementById('start-day').value;
   const endDay = document.getElementById('end-day').value;
 
@@ -191,7 +228,6 @@ function renderCalendar() {
   
       const monthTitle = document.createElement('h2');
       monthTitle.textContent = `${months[month-1]}`;
-      monthTitle.onclick = () => handleMonthTitleClick(month, year, months);
       calendar.appendChild(monthTitle);
   
       const daysOfWeekContainer = document.createElement('div');
