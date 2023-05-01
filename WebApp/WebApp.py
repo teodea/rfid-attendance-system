@@ -65,10 +65,6 @@ def login():
                     ed = x[2]
                     ay = x[3]
                     temp = now - sd
-            print(s)
-            print(sd)
-            print(ed)
-            print(ay)
             query = "SELECT DISTINCT academicYear FROM Semesters;"
             academicYearList = [read[0] for read in read_query(connection, query)]
             query = "SELECT semesterId FROM Semesters WHERE academicYear='{}';".format(ay)

@@ -1,7 +1,7 @@
 import mysql.connector
 from mysql.connector import Error
 import datetime
-from datetime import datetime
+from datetime import datetime, timedelta
 import random
 
 def create_db_connection(host_name, user_name, user_password, db_name):
@@ -166,7 +166,8 @@ def CalculateNextDay(currentDay):
         isLeapYear = True
     if (month == "12") and (day == "31"):
         currentDay = "{}-01-01"
-        currentDay = currentDay.format(year+str(1))
+        year = str(int(year)+1)
+        currentDay = currentDay.format(year)
         return currentDay
     if (month == "01") and (day == "31"):
         currentDay = "{}-02-01"
@@ -360,10 +361,12 @@ def fill_enrollment_table(connection):
             if random.random() >= 0.6:
                 break
 
-def fill_attendances_tables_fake_data(connection):
+def update_attendances_tables_fake_data(connection):
     query = """SELECT * FROM Enrollment;"""
     readEnrollment = read_query(connection, query)
     for x in readEnrollment:
+        probability = random.gauss(0.8, 0.2)
+        probability = max(0, min(1, probability))
         studentId = x[0]
         courseId = x[1]
         sectionId = x[2]
@@ -376,14 +379,12 @@ def fill_attendances_tables_fake_data(connection):
             endCourseDay = y[1]
         startCourseDay = startCourseDay.strftime('%Y-%m-%d')
         endCourseDay = endCourseDay.strftime('%Y-%m-%d')
-        print(startCourseDay)
-        print(endCourseDay)
-        return
         query = """SELECT * FROM Classes WHERE courseId='{}' AND sectionId='{}' AND semesterId='{}' AND academicYear='{}';""".format(courseId, sectionId, semesterId, academicYear)
         readClasses = read_query(connection, query)
         check = True
         for y in readClasses:
             daysOfTheWeek = y[4]
+            startTime = y[5]
             if y[9] == 'Online': check = False
         currentDay = startCourseDay
         while(check):
@@ -392,11 +393,19 @@ def fill_attendances_tables_fake_data(connection):
             day = currentDay[8:10].zfill(2)
             formattedDay = datetime(int(year), int(month), int(day))
             if formattedDay.strftime("%A") in daysOfTheWeek:
-                stringDay = "{}{}{}"
-                stringDay = stringDay.format(year, month, day)
-                query = """
-                INSERT INTO Class_{}_{}_Day_{} VALUES ('{}', NULL);""".format(courseId, sectionId, stringDay, studentId)
-                execute_query(connection, query)
+                stringDay = "{}{}{}".format(year, month, day)
+                if random.random() < probability:
+                    offsetMinutes = random.gauss(0, 10)
+                    offsetSeconds = int(offsetMinutes * 60)
+                    randomTime = startTime + timedelta(seconds=offsetSeconds)
+                    timestamp = datetime.combine(formattedDay, datetime.min.time()) + randomTime
+                    query = """
+                    UPDATE Class_{}_{}_Day_{}
+                    SET checkIn='{}'
+                    WHERE studentId='{}';
+                    """
+                    query = query.format(courseId, sectionId, stringDay, timestamp, studentId)
+                    execute_query(connection, query)
             stringDayCheck = "{}-{}-{}".format(year, month, day)
             if stringDayCheck == endCourseDay:
                 break
@@ -407,12 +416,12 @@ if __name__ == '__main__':
 
     #delete_tables(connection)
     #create_tables(connection)
+    #fill_enrollment_table(connection)
 
     #delete_attendances_tables(connection)
     #create_attendances_tables(connection)
-    #fill_enrollment_table(connection)
     #fill_attendances_tables(connection)
-    fill_attendances_tables_fake_data(connection)
+    #update_attendances_tables_fake_data(connection)
 
     #query = """SHOW TABLES;"""
     #query = """SELECT * FROM Classes;"""
