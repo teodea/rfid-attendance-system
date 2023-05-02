@@ -1,3 +1,28 @@
+async function download_time_by_attendance_per_class() {
+  const instructorId = $('#instructor-id').val();
+  const academicYear = $('#academic-year').val();
+  const semesterId = $('#semester').val();
+  return new Promise((resolve, reject) => {
+    $.ajax({
+      url: '/download-csv?instructorId=' + instructorId + '&academicYear=' + academicYear + '&semesterId=' + semesterId,
+      type: 'GET',
+      success: function(response) {
+        const blob = new Blob([response], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const downloadLink = document.createElement('a');
+        downloadLink.href = url;
+        downloadLink.download = 'data.csv';
+        downloadLink.click();
+        window.URL.revokeObjectURL(url);
+      },
+      error: function(xhr, textStatus, errorThrown) {
+        console.error('Error downloading CSV:', errorThrown);
+        reject(errorThrown);
+      }
+    });
+  });
+}
+
 function getClassesAll() {
   return new Promise((resolve, reject) => {
     const instructorId = $('#instructor-id').val();
@@ -328,6 +353,15 @@ function handleCourseClick(course) {
   renderCourseSemester(course);
 }
 
+function handleDownloadClick() {
+  console.log(`Download clicked`);
+  download_time_by_attendance_per_class();
+  //download_time_by_attendance_all_classes();
+  //download_time_by_attendance_student_x();
+  //download_class_x_by_attendance_student_x();
+  //download_class_x_by_attendance_all_students();
+}
+
 async function renderCourses() {
   const coursesContainer = document.getElementById('courses-container');
   coursesContainer.innerHTML = '';
@@ -343,6 +377,11 @@ async function renderCourses() {
     button.onclick = () => handleCourseClick(course);
     courses.appendChild(button);
   });
+  const buttonData = document.createElement('button');
+  buttonData.innerHTML = "download data";
+  buttonData.className = 'download-button';
+  buttonData.onclick = () => handleDownloadClick();
+  courses.appendChild(buttonData);
 
   coursesContainer.appendChild(courses);
 }
