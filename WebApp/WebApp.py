@@ -324,8 +324,8 @@ def download_csv():
     data = []
     query = "SELECT studentId, name FROM Students"
     readStudents = read_query(connection, query)
-    student_id_to_name = {student[0]: student[1] for student in readStudents}
-    students_enrolled_in_courses = {}
+    studentIdToName = {student[0]: student[1] for student in readStudents}
+    studentsEnrolledInCourses = {}
     query = """SELECT * FROM Classes WHERE instructorId='{}' AND academicYear='{}' AND semesterId='{}'""".format(instructorId, academicYear, semesterId)
     readClasses = read_query(connection, query)
     for x in readClasses:
@@ -360,7 +360,7 @@ def download_csv():
                     readAttendance = read_query(connection, query)
                     if readAttendance != None:
                         break
-                students_enrolled_in_courses[courseId] = {y[0] for y in readAttendance}
+                studentsEnrolledInCourses[courseId] = {y[0] for y in readAttendance}
                 for y in readAttendance:
                     countTotal = countTotal + 1
                     if y[1] is not None:
@@ -374,30 +374,30 @@ def download_csv():
                     'start_time': startTime,
                     'end_time': endTime
                 })
-                unique_student_ids = sorted(set(student_id for row in data for student_id in row['students'].keys()))
+                uniqueStudentId = sorted(set(studentId for row in data for studentId in row['students'].keys()))
             stringDayCheck = "{}-{}-{}".format(year, month, day)
             if stringDayCheck == endCourseDay:
                 break
             currentDay = CalculateNextDay(currentDay)
-    unique_student_ids = sorted(set(student_id for row in data for student_id in row['students'].keys()))
-    unique_student_names = [student_id_to_name[student_id] for student_id in unique_student_ids]
+    uniqueStudentId = sorted(set(studentId for row in data for studentId in row['students'].keys()))
+    uniqueStudentNames = [studentIdToName[studentId] for studentId in uniqueStudentId]
     csv_data = io.StringIO()
     writer = csv.writer(csv_data)
-    header = ['Day', 'Course', 'Attendance', 'Total Students', 'Start Time', 'End Time'] + unique_student_names
+    header = ['Day', 'Course', 'Attendance', 'Total Students', 'Start Time', 'End Time'] + uniqueStudentNames
     writer.writerow(header)
     for row in data:
-        student_checkin_times = []
-        for student_id in unique_student_ids:
-            checkin_timestamp = row['students'].get(student_id, None)
-            if student_id in students_enrolled_in_courses[row['course']]:
-                if isinstance(checkin_timestamp, datetime.datetime):
-                    checkin_time = checkin_timestamp.strftime('%H:%M:%S')
-                    student_checkin_times.append(checkin_time)
+        studentCheckInTimes = []
+        for studentId in uniqueStudentId:
+            checkInTimestamp = row['students'].get(studentId, None)
+            if studentId in studentsEnrolledInCourses[row['course']]:
+                if isinstance(checkInTimestamp, datetime.datetime):
+                    checkinTime = checkInTimestamp.strftime('%H:%M:%S')
+                    studentCheckInTimes.append(checkinTime)
                 else:
-                    student_checkin_times.append('Absent')
+                    studentCheckInTimes.append('Absent')
             else:
-                student_checkin_times.append('')
-        writer.writerow([row['day'], row['course'], row['attendance'], row['total_students'], row['start_time'], row['end_time']] + student_checkin_times)
+                studentCheckInTimes.append('')
+        writer.writerow([row['day'], row['course'], row['attendance'], row['total_students'], row['start_time'], row['end_time']] + studentCheckInTimes)
     response = Response(csv_data.getvalue(), content_type='text/csv')
     response.headers['Content-Disposition'] = 'attachment; filename=data.csv'
     return response

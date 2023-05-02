@@ -1,4 +1,4 @@
-async function download_time_by_attendance_per_class() {
+async function download() {
   const instructorId = $('#instructor-id').val();
   const academicYear = $('#academic-year').val();
   const semesterId = $('#semester').val();
@@ -355,11 +355,7 @@ function handleCourseClick(course) {
 
 function handleDownloadClick() {
   console.log(`Download clicked`);
-  download_time_by_attendance_per_class();
-  //download_time_by_attendance_all_classes();
-  //download_time_by_attendance_student_x();
-  //download_class_x_by_attendance_student_x();
-  //download_class_x_by_attendance_all_students();
+  download();
 }
 
 async function renderCourses() {
