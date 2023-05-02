@@ -1,79 +1,79 @@
 body {
-    font-family: Arial, sans-serif;
-    background-image: url('images/palm-tree-background.jpg');
-    background-size: cover;
-    background-repeat: no-repeat;
+  font-family: Arial, sans-serif;
+  background-image: url('images/palm-tree-background.jpg');
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+.banner {
+  font-family: 'Arial';
+  font-size: 24px;
+  text-align: center;
+  padding: 20px;
+  background-color: #9370DB;
+  color: #FFF;
+  width: 50%;
+  margin: 20px auto 40px auto;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  animation: fadeIn 5s;
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px);
   }
-  
-  .banner {
-    font-family: 'Arial';
-    font-size: 24px;
-    text-align: center;
-    padding: 20px;
-    background-color: #9370DB;
-    color: #FFF;
-    width: 50%;
-    margin: 20px auto 40px auto;
-    border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    animation: fadeIn 5s;
+  100% {
+    opacity: 1;
+    transform: translateY(0);
   }
-  
-  @keyframes fadeIn {
-    0% {
-      opacity: 0;
-      transform: translateY(-20px);
-    }
-    100% {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-  
-  .container {
-    width: 350px;
-    background-color: white;
-    border-radius: 10px;
-    padding: 30px;
-    margin: 0 auto;
-    box-shadow: 0 4px 6px rgb(147,112,219);
-  }
-  
-  h1 {
-    color: #9370DB;
-    text-align: center;
-  }
-  
-  input[type="text"], input[type="password"] {
-    display: block;
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 10px;
-    font-size: 16px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    box-sizing: border-box;
-  }
-  
-  input[type="submit"] {
-    display: block;
-    width: 100%;
-    padding: 10px;
-    font-size: 16px;
-    background-color: #9370DB;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.2s;
-  }
-  
-  input[type="submit"]:hover {
-    background-color: #9370DB;
-  }
-  
-  .error {
-    color: red;
-    font-size: 14px;
-    margin-top: 10px;
-  }
+}
+
+.container {
+  width: 350px;
+  background-color: white;
+  border-radius: 10px;
+  padding: 30px;
+  margin: 0 auto;
+  box-shadow: 0 4px 6px rgb(147,112,219);
+}
+
+h1 {
+  color: #9370DB;
+  text-align: center;
+}
+
+input[type="text"], input[type="password"] {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-sizing: border-box;
+}
+
+input[type="submit"] {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  background-color: #9370DB;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+input[type="submit"]:hover {
+  background-color: #9370DB;
+}
+
+.error {
+  color: red;
+  font-size: 14px;
+  margin-top: 10px;
+}
