@@ -18,6 +18,51 @@ height: 100vh;
 margin: 0;
 }
 
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f2f2f2;
+}
+h1 {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 36px;
+  color: #ffffff;
+  margin-top: 50px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+label {
+font-family: Arial, sans-serif;
+font-size: 16px;
+color: #ffffff;
+margin-top: 10px;
+margin-bottom: 5px;
+display: block;
+}
+
+.select-container {
+  display: flex;
+  align-items: center;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 5px;
+  background-color: #f5f5f5;
+}
+
+#academic-year, #semester {
+  width: 8%;
+  padding: 5px;
+  border: none;
+  border-radius: 3px;
+  font-size: 16px;
+  font-family: Arial, sans-serif;
+  color: #333;
+  background-color: rgba(255, 255, 255, 0.7);
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1);
+}
+
+#calendar-container {
+  margin: 20px;
+}
 
 @keyframes fadeIn {
   0% {
@@ -31,11 +76,11 @@ margin: 0;
 }
 
 h1 {
-color: #005030;
+color: #FFFFFF;
 }
 
 label, #year {
-color: #005030;
+color: #FFFFFF;
 }
 
 #calendar-container {
